@@ -1,12 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"os"
 
-	"github.com/Vladosya/nft-market-frontend/pkg/telegram"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,7 +26,13 @@ func main() {
 		bot.Debug = false
 	}
 
-	telegramBot := telegram.NewBot(bot)
+	db, err := sql.Open("sqlite3", "my.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	telegramBot := telegram.NewBot(bot, db)
 	if err := telegramBot.Start(); err != nil {
 		log.Fatal(err)
 	}

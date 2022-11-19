@@ -1,0 +1,1 @@
+CREATE TABLE bot_params(id INTEGER PRIMARY KEY NOT NULL, tele_id BIGINT NOT NULL, lang);
