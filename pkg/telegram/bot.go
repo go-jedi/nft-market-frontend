@@ -1,15 +1,18 @@
 package telegram
 
 import (
+	"database/sql"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type Bot struct {
-	Bot *tgbotapi.BotAPI
+	Bot      *tgbotapi.BotAPI
+	SqliteDb *sql.DB
 }
 
-func NewBot(bot *tgbotapi.BotAPI) *Bot {
-	return &Bot{Bot: bot}
+func NewBot(bot *tgbotapi.BotAPI, sqliteDb *sql.DB) *Bot {
+	return &Bot{Bot: bot, SqliteDb: sqliteDb}
 }
 
 func (b *Bot) Start() error {

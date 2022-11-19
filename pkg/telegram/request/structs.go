@@ -5,9 +5,9 @@ type UserCheckAuth struct {
 }
 
 type UserCheckAuthResponse struct {
+	Status  int    `json:"status"`
 	Message string `json:"message"`
 	Result  bool   `json:"result"`
-	Status  int    `json:"status"`
 }
 
 type UserRegister struct {
@@ -16,8 +16,60 @@ type UserRegister struct {
 }
 
 type UserRegisterResponse struct {
-	Message string `json:"message"`
 	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type UserGetUserLanguage struct {
+	TeleId int64 `json:"tele_id"`
+}
+
+type UserLanguage struct {
+	Id     int    `json:"id"`
+	TeleId int64  `json:"tele_id"`
+	Lang   string `json:"lang"`
+}
+
+type UserGetUserLanguageResponse struct {
+	Status  int            `json:"status"`
+	Message string         `json:"message"`
+	Result  []UserLanguage `json:"result"`
+}
+
+type UserUpdateLanguage struct {
+	TeleId int64  `json:"tele_id"`
+	Lang   string `json:"lang"`
+}
+
+type UserUpdateLanguageResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type UserGetUserCurrency struct {
+	TeleId int64 `json:"tele_id"`
+}
+
+type UserCurrency struct {
+	Id       int    `json:"id"`
+	TeleId   int64  `json:"tele_id"`
+	Currency string `json:"currency"`
+}
+
+type UserGetUserCurrencyResponse struct {
+	Status  int            `json:"status"`
+	Message string         `json:"message"`
+	Result  []UserCurrency `json:"result"`
+}
+
+type UserUpdateCurrency struct {
+	TeleId   int64  `json:"tele_id"`
+	Currency string `json:"currency"`
+}
+
+type UserUpdateCurrencyResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
 }
 
 type UserCheckIsTerms struct {
@@ -25,28 +77,46 @@ type UserCheckIsTerms struct {
 }
 
 type UserCheckIsTermsResponse struct {
+	Status  int    `json:"status"`
 	Message string `json:"message"`
 	Result  bool   `json:"result"`
-	Status  int    `json:"status"`
 }
 
-type UserCheckIsForm struct {
+type UserAgreeTerms struct {
 	TeleId int64 `json:"tele_id"`
 }
 
-type UserCheckIsFormResponse struct {
-	Message string `json:"message"`
-	Result  bool   `json:"result"`
+type UserAgreeTermsResponse struct {
 	Status  int    `json:"status"`
+	Message string `json:"message"`
 }
 
-type UserCheckIsStatusBot struct {
+type UserGetUserProfile struct {
 	TeleId int64 `json:"tele_id"`
 }
 
-type UserCheckIsStatusBotResponse struct {
-	Message string `json:"message"`
-	Result  bool   `json:"result"`
-	Status  int    `json:"status"`
-	IsAdmin bool   `json:"is_admin"`
+type UserProfile struct {
+	Id           int   `json:"id"`
+	TeleId       int64 `json:"tele_id"`
+	Balance      int64 `json:"balance"`
+	Conclusion   int64 `json:"conclusion"`
+	Verification bool  `json:"verification"`
+}
+
+type UserGetUserProfileResponse struct {
+	Status  int           `json:"status"`
+	Message string        `json:"message"`
+	Result  []UserProfile `json:"result"`
+}
+
+type Payment struct {
+	Id    int    `json:"id"`
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+type UserGetAllPaymentsResponse struct {
+	Status  int       `json:"status"`
+	Message string    `json:"message"`
+	Result  []Payment `json:"result"`
 }
