@@ -10,7 +10,7 @@ import (
 )
 
 var baseTest string = "http://localhost:8080/api-v1"
-var baseProd string = "http://localhost:8080/api-v1"
+var baseProd string = "http://195.211.99.62/api-v1"
 var baseUrl string = ""
 
 var contentType string = "application/json"
