@@ -84,7 +84,7 @@ func RegisterUser(teleId int64, teleName string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Println("body -->", b)
+	fmt.Println("body -->", string(b))
 	fmt.Println("RegisterUser response.StatusCode ->", response.StatusCode)
 	if response.StatusCode == 200 {
 		body, err := io.ReadAll(response.Body)
