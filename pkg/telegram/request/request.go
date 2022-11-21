@@ -343,3 +343,254 @@ func GetAllPayments() ([]Payment, error) {
 
 	return []Payment{}, nil
 }
+
+func GetAllCollections() ([]Collection, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "collection/getAll")
+	response, err := http.Get(baseUrl)
+	if err != nil {
+		return []Collection{}, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return []Collection{}, err
+		}
+		var userGetAllCollectionsResponse UserGetAllCollectionsResponse
+		err = json.Unmarshal([]byte(body), &userGetAllCollectionsResponse)
+		if err != nil {
+			return []Collection{}, err
+		}
+		if userGetAllCollectionsResponse.Status == 200 && len(userGetAllCollectionsResponse.Result) > 0 {
+			return userGetAllCollectionsResponse.Result, nil
+		}
+	}
+
+	return []Collection{}, nil
+}
+
+func GetAllTokensCollection(collectionUid string) ([]TokensGetByCollection, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "collection/getAllTokensCollection")
+	userGetAllTokensCollection := UserGetAllTokensCollection{
+		UidCollection: collectionUid,
+	}
+	userGetAllTokensCollectionJson, err := json.Marshal(userGetAllTokensCollection)
+	if err != nil {
+		return []TokensGetByCollection{}, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userGetAllTokensCollectionJson))
+	if err != nil {
+		return []TokensGetByCollection{}, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return []TokensGetByCollection{}, err
+		}
+		var userGetAllTokensCollectionResponse UserGetAllTokensCollectionResponse
+		err = json.Unmarshal([]byte(body), &userGetAllTokensCollectionResponse)
+		if err != nil {
+			return []TokensGetByCollection{}, err
+		}
+		if userGetAllTokensCollectionResponse.Status == 200 && len(userGetAllTokensCollectionResponse.Result) > 0 {
+			return userGetAllTokensCollectionResponse.Result, nil
+		}
+	}
+
+	return []TokensGetByCollection{}, nil
+}
+
+func GetToken(tokenUid string) ([]Token, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "collection/getToken")
+	userGetToken := UserGetToken{
+		TokenUid: tokenUid,
+	}
+	userGetTokenJson, err := json.Marshal(userGetToken)
+	if err != nil {
+		return []Token{}, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userGetTokenJson))
+	if err != nil {
+		return []Token{}, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return []Token{}, err
+		}
+		var userGetTokenResponse UserGetTokenResponse
+		err = json.Unmarshal([]byte(body), &userGetTokenResponse)
+		if err != nil {
+			return []Token{}, err
+		}
+		if userGetTokenResponse.Status == 200 && len(userGetTokenResponse.Result) > 0 {
+			return userGetTokenResponse.Result, nil
+		}
+	}
+
+	return []Token{}, nil
+}
+
+func CheckIsAdmin(teleId int64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/checkIsAdmin")
+	userCheckIsAdmin := UserCheckIsAdmin{
+		TeleId: teleId,
+	}
+	userCheckIsAdminJson, err := json.Marshal(userCheckIsAdmin)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userCheckIsAdminJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userCheckIsAdminResponse UserCheckIsAdminResponse
+		err = json.Unmarshal([]byte(body), &userCheckIsAdminResponse)
+		if err != nil {
+			return false, err
+		}
+		if userCheckIsAdminResponse.Status == 200 && userCheckIsAdminResponse.Result {
+			return userCheckIsAdminResponse.Result, nil
+		}
+	}
+
+	return false, nil
+}
+
+func CreateReferral(teleId int64, teleName string, adminReferral int64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/createReferral")
+	userCreateReferral := UserCreateReferral{
+		TeleId:        teleId,
+		TeleName:      teleName,
+		AdminReferral: adminReferral,
+	}
+	userCreateReferralJson, err := json.Marshal(userCreateReferral)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userCreateReferralJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userCreateReferralResponse UserCreateReferralResponse
+		err = json.Unmarshal([]byte(body), &userCreateReferralResponse)
+		if err != nil {
+			return false, err
+		}
+		if userCreateReferralResponse.Status == 200 {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func GetUserReferral(teleId int64) ([]Referral, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/getUserReferral")
+	userGetUserReferral := UserGetUserReferral{
+		TeleId: teleId,
+	}
+	userGetUserReferralJson, err := json.Marshal(userGetUserReferral)
+	if err != nil {
+		return []Referral{}, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userGetUserReferralJson))
+	if err != nil {
+		return []Referral{}, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return []Referral{}, err
+		}
+		var userGetUserReferralResponse UserGetUserReferralResponse
+		err = json.Unmarshal([]byte(body), &userGetUserReferralResponse)
+		if err != nil {
+			return []Referral{}, err
+		}
+		if userGetUserReferralResponse.Status == 200 && len(userGetUserReferralResponse.Result) > 0 {
+			return userGetUserReferralResponse.Result, nil
+		}
+	}
+
+	return []Referral{}, nil
+}
+
+func AdminGetUserProfile(teleId int64) ([]AdminUserProfile, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/getUserProfile")
+	AdminUserProfileGet := AdminUserProfileGet{
+		TeleId: teleId,
+	}
+	AdminUserProfileGetJson, err := json.Marshal(AdminUserProfileGet)
+	if err != nil {
+		return []AdminUserProfile{}, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(AdminUserProfileGetJson))
+	if err != nil {
+		return []AdminUserProfile{}, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return []AdminUserProfile{}, err
+		}
+		var adminUserProfileGetResponse AdminUserProfileGetResponse
+		err = json.Unmarshal([]byte(body), &adminUserProfileGetResponse)
+		if err != nil {
+			return []AdminUserProfile{}, err
+		}
+		if adminUserProfileGetResponse.Status == 200 && len(adminUserProfileGetResponse.Result) > 0 {
+			return adminUserProfileGetResponse.Result, nil
+		}
+	}
+
+	return []AdminUserProfile{}, nil
+}
+
+func AdminUpdatePremium(teleId int64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/updatePremium")
+	userAdminUpdatePremium := UserAdminUpdatePremium{
+		TeleId: teleId,
+	}
+	userAdminUpdatePremiumJson, err := json.Marshal(userAdminUpdatePremium)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userAdminUpdatePremiumJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userAdminUpdatePremiumResponse UserAdminUpdatePremiumResponse
+		err = json.Unmarshal([]byte(body), &userAdminUpdatePremiumResponse)
+		if err != nil {
+			return false, err
+		}
+		if userAdminUpdatePremiumResponse.Status == 200 {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}

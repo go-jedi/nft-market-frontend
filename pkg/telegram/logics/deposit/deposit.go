@@ -7,7 +7,7 @@ import (
 
 func Deposit(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, userName string, languageUser string) error {
 	if len(languageUser) > 0 {
-		photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath("/home/dale/job/work/my-project/nft-market/frontend/img/img-deposit.jpg"))
+		photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath("/home/dale/job/work/my-project/nft-market/frontend/img/img-need/2.jpg"))
 		photo.ParseMode = "Markdown"
 		if languageUser == "ru" {
 			photo.Caption = "Выберите метод пополнения:"
