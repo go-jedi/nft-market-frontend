@@ -13,7 +13,6 @@ func GetStart(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, us
 	if err != nil {
 		return err
 	}
-	fmt.Println("resCheckAuth -->", resCheckAuth)
 	if resCheckAuth {
 		fmt.Println("1")
 		resGetUserLanguage, err := requestProject.GetUserLanguage(teleId)
@@ -123,10 +122,7 @@ func GetStart(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, us
 		if err != nil {
 			return err
 		}
-		fmt.Println("resRegisterUser -->", resRegisterUser)
 		if resRegisterUser {
-			fmt.Println("resRegisterUse 1 -->")
-			fmt.Println("resRegisterUse 1 -->")
 			var text string = "🏳️?"
 			msg.ReplyMarkup = keyboard.DgLangKeyboardInline
 			msg.Text = text

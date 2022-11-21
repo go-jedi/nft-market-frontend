@@ -37,23 +37,16 @@ func CheckAuth(teleId int64) (bool, error) {
 		return false, err
 	}
 	defer response.Body.Close()
-	fmt.Println("CheckAuth response ->", response)
-	fmt.Println("CheckAuth response.Body ->", response.Body)
-	fmt.Println("CheckAuth response.StatusCode ->", response.StatusCode)
 	if response.StatusCode == 200 {
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
 			return false, err
 		}
-		fmt.Println("body -->", string(body))
 		var userCheckAuthResponse UserCheckAuthResponse
 		err = json.Unmarshal([]byte(body), &userCheckAuthResponse)
 		if err != nil {
 			return false, err
 		}
-		fmt.Println("userCheckAuthResponse -->", userCheckAuthResponse.Status)
-		fmt.Println("userCheckAuthResponse -->", userCheckAuthResponse.Message)
-		fmt.Println("userCheckAuthResponse -->", userCheckAuthResponse.Result)
 		if userCheckAuthResponse.Status == 200 && userCheckAuthResponse.Result {
 			return true, nil
 		} else {
@@ -78,23 +71,12 @@ func RegisterUser(teleId int64, teleName string) (bool, error) {
 		return false, err
 	}
 	defer response.Body.Close()
-	fmt.Println("RegisterUser response ->", response)
-	fmt.Println("RegisterUser response.Body ->", response.Body)
-	b, err := io.ReadAll(response.Body)
-	if err != nil {
-		return false, err
-	}
-	fmt.Println("body -->", string(b))
-	fmt.Println("RegisterUser response.StatusCode ->", response.StatusCode)
 	if response.StatusCode == 200 {
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
 			return false, err
 		}
-		fmt.Println("body -->", string(body))
 		var userRegisterResponse UserRegisterResponse
-		fmt.Println("userRegisterResponse -->", userRegisterResponse.Status)
-		fmt.Println("userRegisterResponse -->", userRegisterResponse.Message)
 		err = json.Unmarshal([]byte(body), &userRegisterResponse)
 		if err != nil {
 			return false, err

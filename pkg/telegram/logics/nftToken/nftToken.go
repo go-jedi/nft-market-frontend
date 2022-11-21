@@ -2,6 +2,7 @@ package nftToken
 
 import (
 	"fmt"
+	"os"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/keyboard"
@@ -16,8 +17,14 @@ func NftToken(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, us
 				return err
 			}
 			if len(resGetToken) > 0 {
-				fmt.Println("resGetToken[0].TokenUid -->", resGetToken[0].TokenUid)
-				photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath(fmt.Sprintf("/home/dale/job/work/my-project/nft-market/frontend/img/nft/%s.jpg", resGetToken[0].TokenUid)))
+				var isTesting string = os.Getenv("IS_TESTING")
+				var needPath string = ""
+				if isTesting == "true" {
+					needPath = "/home/dale/job/work/my-project/nft-market/frontend/img"
+				} else {
+					needPath = "/home/nft-market-bot/frontend/nft-market-frontend/img"
+				}
+				photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath(fmt.Sprintf("%s/nft/%s.jpg", needPath, resGetToken[0].TokenUid)))
 				photo.ParseMode = "Markdown"
 				if languageUser == "ru" {
 					photo.Caption = fmt.Sprintf("💠 Токен *%s*\n\n🗂 Коллекция: *%s*\n👩‍💻 Автор: *%s*\n🔹 Блокчейн: *%s*\n\n💸 Цена: *$%.2f*",
