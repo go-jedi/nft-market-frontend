@@ -71,6 +71,7 @@ func RegisterUser(teleId int64, teleName string) (bool, error) {
 		return false, err
 	}
 	defer response.Body.Close()
+	fmt.Println("response -->", response)
 	if response.StatusCode == 200 {
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
