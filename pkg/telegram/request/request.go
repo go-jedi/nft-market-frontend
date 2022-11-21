@@ -78,13 +78,18 @@ func RegisterUser(teleId int64, teleName string) (bool, error) {
 		return false, err
 	}
 	defer response.Body.Close()
-	fmt.Println("response -->", response)
+	fmt.Println("RegisterUser response ->", response)
+	fmt.Println("RegisterUser response.Body ->", response.Body)
+	fmt.Println("RegisterUser response.StatusCode ->", response.StatusCode)
 	if response.StatusCode == 200 {
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
 			return false, err
 		}
+		fmt.Println("body -->", string(body))
 		var userRegisterResponse UserRegisterResponse
+		fmt.Println("userRegisterResponse -->", userRegisterResponse.Status)
+		fmt.Println("userRegisterResponse -->", userRegisterResponse.Message)
 		err = json.Unmarshal([]byte(body), &userRegisterResponse)
 		if err != nil {
 			return false, err
