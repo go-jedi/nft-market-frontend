@@ -45,11 +45,15 @@ func CheckAuth(teleId int64) (bool, error) {
 		if err != nil {
 			return false, err
 		}
+		fmt.Println("body -->", string(body))
 		var userCheckAuthResponse UserCheckAuthResponse
 		err = json.Unmarshal([]byte(body), &userCheckAuthResponse)
 		if err != nil {
 			return false, err
 		}
+		fmt.Println("userCheckAuthResponse -->", userCheckAuthResponse.Status)
+		fmt.Println("userCheckAuthResponse -->", userCheckAuthResponse.Message)
+		fmt.Println("userCheckAuthResponse -->", userCheckAuthResponse.Result)
 		if userCheckAuthResponse.Status == 200 && userCheckAuthResponse.Result {
 			return true, nil
 		} else {
