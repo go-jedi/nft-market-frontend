@@ -1,6 +1,8 @@
 package start
 
 import (
+	"fmt"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/keyboard"
 	requestProject "github.com/rob-bender/nft-market-frontend/pkg/telegram/request"
@@ -11,22 +13,28 @@ func GetStart(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, us
 	if err != nil {
 		return err
 	}
+	fmt.Println("resCheckAuth -->", resCheckAuth)
 	if resCheckAuth {
+		fmt.Println("1")
 		resGetUserLanguage, err := requestProject.GetUserLanguage(teleId)
 		if err != nil {
 			return err
 		}
+		fmt.Println("2")
 		if len(resGetUserLanguage[0].Lang) > 0 {
+			fmt.Println("3")
 			resGetUserCurrency, err := requestProject.GetUserCurrency(teleId)
 			if err != nil {
 				return err
 			}
 			if len(resGetUserCurrency[0].Currency) > 0 {
+				fmt.Println("4")
 				resCheckIsTerms, err := requestProject.CheckIsTerms(teleId)
 				if err != nil {
 					return err
 				}
 				if resCheckIsTerms {
+					fmt.Println("5")
 					var textTwo string = ""
 					if resGetUserLanguage[0].Lang == "ru" {
 						textTwo = "Если у вас не появилось меню, то напишите /start"

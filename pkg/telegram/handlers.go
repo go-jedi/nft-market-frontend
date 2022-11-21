@@ -51,6 +51,7 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 			}
 		}
 		msg.ParseMode = "Markdown"
+		fmt.Println("start111111111111111111")
 		err := start.GetStart(b.Bot, msg, message.From.ID, message.From.UserName)
 		if err != nil {
 			return err
