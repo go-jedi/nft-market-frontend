@@ -9,8 +9,8 @@ import (
 	"os"
 )
 
-var baseTest string = "http://localhost:8080/api-v1"
-var baseProd string = "http://195.211.99.62/api-v1"
+var baseTest string = "http://localhost:8000/api-v1"
+var baseProd string = "http://195.211.99.62:8000/api-v1"
 var baseUrl string = ""
 
 var contentType string = "application/json"
