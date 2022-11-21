@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	requestProject "github.com/rob-bender/nft-market-frontend/pkg/telegram/request"
 )
 
 func GenKeyboardInlineForAgreeTerms(textBtn string, isAgreeTerms bool, lang string) tgbotapi.InlineKeyboardMarkup {
@@ -14,12 +15,20 @@ func GenKeyboardInlineForAgreeTerms(textBtn string, isAgreeTerms bool, lang stri
 	)
 }
 
-func GenKeyboardInlineForNftMenu(textBtn string) tgbotapi.InlineKeyboardMarkup {
-	return tgbotapi.NewInlineKeyboardMarkup(
-		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData(textBtn, "NM_PROFILE"),
-		),
-	)
+func GenKeyboardInlineForNftMenu(collections []requestProject.Collection, textBtn string) tgbotapi.InlineKeyboardMarkup {
+	var keyboardCollection tgbotapi.InlineKeyboardMarkup = tgbotapi.NewInlineKeyboardMarkup()
+	if len(collections) > 0 {
+		for _, value := range collections {
+			keyboardCollection.InlineKeyboard = append(keyboardCollection.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(
+				tgbotapi.NewInlineKeyboardButtonData(fmt.Sprintf("%s (%d)", value.Name, value.Count), fmt.Sprintf("NM_NFT_COLL?%s", value.CollectionUid)),
+			))
+		}
+	}
+	keyboardCollection.InlineKeyboard = append(keyboardCollection.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(
+		tgbotapi.NewInlineKeyboardButtonData(textBtn, "NM_PROFILE"),
+	))
+
+	return keyboardCollection
 }
 
 func GenKeyboardInlineForSupportMenu(textSupport string, textBackProfile string) tgbotapi.InlineKeyboardMarkup {
@@ -136,6 +145,76 @@ func GenKeyboardInlineForWithDrawPayment(textSupport string, textBackProfile str
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(textBackProfile, "NM_PROFILE"),
+		),
+	)
+}
+
+func GenKeyboardInlineForNftCollection(tokensCollection []requestProject.TokensGetByCollection, textBackProfile string) tgbotapi.InlineKeyboardMarkup {
+	var keyboardtokensCollection tgbotapi.InlineKeyboardMarkup = tgbotapi.NewInlineKeyboardMarkup()
+	if len(tokensCollection) > 0 {
+		for _, value := range tokensCollection {
+			keyboardtokensCollection.InlineKeyboard = append(keyboardtokensCollection.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(
+				tgbotapi.NewInlineKeyboardButtonData(fmt.Sprintf("%s ($%.2f)", value.NameToken, value.PriceToken), fmt.Sprintf("NM_NFT_COLL_T?%s", value.TokenUid)),
+			))
+		}
+	}
+	keyboardtokensCollection.InlineKeyboard = append(keyboardtokensCollection.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(
+		tgbotapi.NewInlineKeyboardButtonData(textBackProfile, "NM_NFT"),
+	))
+
+	return keyboardtokensCollection
+}
+
+func GenKeyboardInlineForNftToken(token []requestProject.Token, textBuy string, textBackProfile string) tgbotapi.InlineKeyboardMarkup {
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(textBuy, fmt.Sprintf("NM_NFT_COLL_TB?%s", token[0].TokenUid)),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(textBackProfile, fmt.Sprintf("NM_NFT_COLL?%s", token[0].UidCollection)),
+		),
+	)
+}
+
+func GenKeyboardInlineForNftTokenBuy(textBackProfile string, tokenUid string) tgbotapi.InlineKeyboardMarkup {
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(textBackProfile, fmt.Sprintf("NM_NFT_COLL_T?%s", tokenUid)),
+		),
+	)
+}
+
+func GenKeyboardInlineForWorkerPanel() tgbotapi.InlineKeyboardMarkup {
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("🦣 Мои мамонты", "NM_WORKPANEL_MAM"),
+		),
+	)
+}
+
+func GenKeyboardInlineForMyMammoths() tgbotapi.InlineKeyboardMarkup {
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("🔙 В меню", "NM_WORKPANEL"),
+		),
+	)
+}
+
+func GenKeyboardInlineForMammothProfile(teleId int64, textPremium string) tgbotapi.InlineKeyboardMarkup {
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(textPremium, fmt.Sprintf("NM_WORKPANEL_MAM_PREM?%d", teleId)),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("🔙 В меню", "NM_WORKPANEL"),
+		),
+	)
+}
+
+func GenKeyboardInlineForChangeMamPremium(teleId int64) tgbotapi.InlineKeyboardMarkup {
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Вернуться к пользователю", fmt.Sprintf("NM_WORKPANEL_MAM_US?%d", teleId)),
 		),
 	)
 }

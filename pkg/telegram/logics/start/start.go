@@ -39,13 +39,28 @@ func GetStart(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, us
 					if err != nil {
 						return err
 					}
-					if resGetUserLanguage[0].Lang == "ru" {
-						msg.ReplyMarkup = keyboard.GenKeyboardHome("NFT", "Личный кабинет", "Информация", "Поддержка")
-						msg.Text = "Главное меню"
+					resCheckIsAdmin, err := requestProject.CheckIsAdmin(teleId)
+					if err != nil {
+						return err
 					}
-					if resGetUserLanguage[0].Lang == "en" {
-						msg.ReplyMarkup = keyboard.GenKeyboardHome("NFT", "Profile", "About", "Support")
-						msg.Text = "Main menu"
+					if resCheckIsAdmin {
+						if resGetUserLanguage[0].Lang == "ru" {
+							msg.ReplyMarkup = keyboard.GenKeyboardHomeAdmin("NFT", "Личный кабинет", "Информация", "Поддержка")
+							msg.Text = "Главное меню"
+						}
+						if resGetUserLanguage[0].Lang == "en" {
+							msg.ReplyMarkup = keyboard.GenKeyboardHomeAdmin("NFT", "Profile", "About", "Support")
+							msg.Text = "Main menu"
+						}
+					} else {
+						if resGetUserLanguage[0].Lang == "ru" {
+							msg.ReplyMarkup = keyboard.GenKeyboardHome("NFT", "Личный кабинет", "Информация", "Поддержка")
+							msg.Text = "Главное меню"
+						}
+						if resGetUserLanguage[0].Lang == "en" {
+							msg.ReplyMarkup = keyboard.GenKeyboardHome("NFT", "Profile", "About", "Support")
+							msg.Text = "Main menu"
+						}
 					}
 					_, err = bot.Send(msg)
 					if err != nil {
@@ -54,7 +69,7 @@ func GetStart(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, us
 				} else {
 					if resGetUserLanguage[0].Lang == "ru" {
 						msg.ParseMode = "HTML"
-						var text string = "Подтвердите, что вы не бот.\n\nНажмимая “Подтвердить“, Вы принимаете условия <a href='https://google.com'>пользовательского соглашения</a>."
+						var text string = "Подтвердите, что вы не бот.\n\nНажмимая “Подтвердить“, Вы принимаете условия <a href='https://static.rarible.com/terms.pdf'>пользовательского соглашения</a>, <a href='https://static.rarible.com/privacy.pdf'>Условия конфиденциальности</a>."
 						msg.ReplyMarkup = keyboard.GenKeyboardInlineForAgreeTerms("✅ Подтвердить", true, resGetUserLanguage[0].Lang)
 						msg.Text = text
 						_, err := bot.Send(msg)
@@ -64,7 +79,7 @@ func GetStart(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, us
 					}
 					if resGetUserLanguage[0].Lang == "en" {
 						msg.ParseMode = "HTML"
-						var text string = "Please, confirm you're not a robot.\n\nBy pressing “Accept“ you confirm that you've read and accept our <a href='https://google.com'>User Agreement</a>."
+						var text string = "Please, confirm you're not a robot.\n\nBy pressing “Accept“ you confirm that you've read and accept our <a href='https://static.rarible.com/terms.pdf'>Terms</a>, <a href='https://static.rarible.com/privacy.pdf'>Privacy</a>."
 						msg.ReplyMarkup = keyboard.GenKeyboardInlineForAgreeTerms("✅ Accept", true, resGetUserLanguage[0].Lang)
 						msg.Text = text
 						_, err := bot.Send(msg)

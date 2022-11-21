@@ -7,7 +7,7 @@ import (
 
 func WithDraw(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, userName string, languageUser string) error {
 	if len(languageUser) > 0 {
-		photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath("/home/dale/job/work/my-project/nft-market/frontend/img/img-withDraw.jpg"))
+		photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath("/home/dale/job/work/my-project/nft-market/frontend/img/img-need/2.jpg"))
 		photo.ParseMode = "Markdown"
 		if languageUser == "ru" {
 			photo.Caption = "⚠️ Обратите внимание, в целях безопасности вывод средств производится на те реквизиты, с которых было произведено последнее пополнение.\n\nВыберите метод снятия:"

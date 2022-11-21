@@ -7,7 +7,7 @@ import (
 
 func Verification(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, userName string, languageUser string) error {
 	if len(languageUser) > 0 {
-		photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath("/home/dale/job/work/my-project/nft-market/frontend/img/img-verification.jpg"))
+		photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath("/home/dale/job/work/my-project/nft-market/frontend/img/img-need/3.jpg"))
 		photo.ParseMode = "Markdown"
 		if languageUser == "ru" {
 			photo.Caption = "*Ваш аккаунт не верифицирован*\n\nДля получения инструкций по прохождению верификации напишите «Верификация» в чат технической поддержки."

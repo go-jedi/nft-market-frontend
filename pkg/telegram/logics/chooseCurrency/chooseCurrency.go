@@ -20,8 +20,9 @@ func ChooseCurrency(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.Message
 				return err
 			}
 			if languageChoose == "ru" {
-				var text string = "Выберите свою валюту"
-				msg.ReplyMarkup = keyboard.DgCurrencyKeyboardInline
+				msg.ParseMode = "HTML"
+				var text string = "Подтвердите, что вы не бот.\n\nНажмимая “Подтвердить“, Вы принимаете условия <a href='https://static.rarible.com/terms.pdf'>пользовательского соглашения</a>, <a href='https://static.rarible.com/privacy.pdf'>Условия конфиденциальности</a>."
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForAgreeTerms("✅ Подтвердить", true, languageChoose)
 				msg.Text = text
 				_, err := bot.Send(msg)
 				if err != nil {
@@ -29,8 +30,9 @@ func ChooseCurrency(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.Message
 				}
 			}
 			if languageChoose == "en" {
-				var text string = "Choose your currency"
-				msg.ReplyMarkup = keyboard.DgCurrencyKeyboardInline
+				msg.ParseMode = "HTML"
+				var text string = "Please, confirm you're not a robot.\n\nBy pressing “Accept“ you confirm that you've read and accept our <a href='https://static.rarible.com/terms.pdf'>Terms</a>, <a href='https://static.rarible.com/privacy.pdf'>Privacy</a>."
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForAgreeTerms("✅ Accept", true, languageChoose)
 				msg.Text = text
 				_, err := bot.Send(msg)
 				if err != nil {

@@ -20,3 +20,21 @@ func GenKeyboardHome(nft string, personalArea string, information string, suppor
 		),
 	)
 }
+
+func GenKeyboardHomeAdmin(nft string, personalArea string, information string, support string) tgbotapi.ReplyKeyboardMarkup {
+	return tgbotapi.NewReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton(fmt.Sprintf("%s 🎆", nft)),
+		),
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton(fmt.Sprintf("%s 📁", personalArea)),
+		),
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton(fmt.Sprintf("%s ℹ️", information)),
+			tgbotapi.NewKeyboardButton(fmt.Sprintf("👨‍💻 %s", support)),
+		),
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton("🛠 Панель воркера"),
+		),
+	)
+}

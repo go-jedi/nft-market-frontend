@@ -16,20 +16,40 @@ import (
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/homeAfterReg"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/myNfts"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/nft"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/nftCollection"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/nftToken"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/nftTokenBuy"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/profile"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/start"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/support"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/verification"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/withDraw"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/withDrawPayment"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/changeMamPremium"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/mammothProfile"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/myMammoths"
+	requestProject "github.com/rob-bender/nft-market-frontend/pkg/telegram/request"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/sqlite"
 )
 
 func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 	msg := tgbotapi.NewMessage(message.From.ID, "Я не знаю такой команды")
+	var needParams = strings.Split(message.Text, " ")
+	var needParamsReferr = strings.Split(message.Text, "/u")
 
 	switch message.Command() {
 	case CommandStart:
+		if len(needParams) > 1 {
+			i, err := strconv.ParseInt(needParams[1], 10, 64)
+			if err != nil {
+				return err
+			}
+			_, err = requestProject.CreateReferral(message.From.ID, message.From.UserName, i)
+			if err != nil {
+				return err
+			}
+		}
 		msg.ParseMode = "Markdown"
 		err := start.GetStart(b.Bot, msg, message.From.ID, message.From.UserName)
 		if err != nil {
@@ -42,11 +62,31 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 			return err
 		}
 	default:
-		msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true) // удалить клавиатуру
-		_, err := b.Bot.Send(msg)
-		if err != nil {
-			return err
+		if len(needParamsReferr) == 2 {
+			resCheckIsAdmin, err := requestProject.CheckIsAdmin(message.From.ID)
+			if err != nil {
+				return err
+			}
+			if resCheckIsAdmin {
+				resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, message.From.ID)
+				if err != nil {
+					return err
+				}
+				i, err := strconv.ParseInt(needParamsReferr[1], 10, 64)
+				if err != nil {
+					return err
+				}
+				err = mammothProfile.MammothProfile(b.Bot, msg, message.From.ID, message.From.UserName, resGetUserLang, i)
+				if err != nil {
+					return err
+				}
+			}
 		}
+		// msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true) // удалить клавиатуру
+		// _, err := b.Bot.Send(msg)
+		// if err != nil {
+		// 	return err
+		// }
 	}
 
 	return nil
@@ -84,18 +124,42 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 			if err != nil {
 				return err
 			}
-			if params[1] == "ru" {
-				msg.ReplyMarkup = keyboard.GenKeyboardHome("NFT", "Личный кабинет", "Информация", "Поддержка")
-				msg.Text = "Главное меню"
+			resCheckIsAdmin, err := requestProject.CheckIsAdmin(callbackQuery.Message.Chat.ID)
+			if err != nil {
+				return err
 			}
-			if params[1] == "en" {
-				msg.ReplyMarkup = keyboard.GenKeyboardHome("NFT", "Profile", "About", "Support")
-				msg.Text = "Main menu"
+			if resCheckIsAdmin {
+				if params[1] == "ru" {
+					msg.ReplyMarkup = keyboard.GenKeyboardHomeAdmin("NFT", "Личный кабинет", "Информация", "Поддержка")
+					msg.Text = "Главное меню"
+				}
+				if params[1] == "en" {
+					msg.ReplyMarkup = keyboard.GenKeyboardHomeAdmin("NFT", "Profile", "About", "Support")
+					msg.Text = "Main menu"
+				}
+			} else {
+				if params[1] == "ru" {
+					msg.ReplyMarkup = keyboard.GenKeyboardHome("NFT", "Личный кабинет", "Информация", "Поддержка")
+					msg.Text = "Главное меню"
+				}
+				if params[1] == "en" {
+					msg.ReplyMarkup = keyboard.GenKeyboardHome("NFT", "Profile", "About", "Support")
+					msg.Text = "Main menu"
+				}
 			}
 			_, err = b.Bot.Send(msg)
 			if err != nil {
 				return err
 			}
+		}
+	case "NM_NFT":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = nft.Nft(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
+		if err != nil {
+			return err
 		}
 	case "NM_PROFILE":
 		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
@@ -143,15 +207,30 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 			return err
 		}
 	case "NM_CHNG_LANG":
-		if needParams[1] == "ru" {
-			msg.ReplyMarkup = keyboard.GenKeyboardHome("NFT", "Личный кабинет", "Информация", "Поддержка")
-			msg.Text = "Главное меню"
+		resCheckIsAdmin, err := requestProject.CheckIsAdmin(callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
 		}
-		if needParams[1] == "en" {
-			msg.ReplyMarkup = keyboard.GenKeyboardHome("NFT", "Profile", "About", "Support")
-			msg.Text = "Main menu"
+		if resCheckIsAdmin {
+			if needParams[1] == "ru" {
+				msg.ReplyMarkup = keyboard.GenKeyboardHomeAdmin("NFT", "Личный кабинет", "Информация", "Поддержка")
+				msg.Text = "Главное меню"
+			}
+			if needParams[1] == "en" {
+				msg.ReplyMarkup = keyboard.GenKeyboardHomeAdmin("NFT", "Profile", "About", "Support")
+				msg.Text = "Main menu"
+			}
+		} else {
+			if needParams[1] == "ru" {
+				msg.ReplyMarkup = keyboard.GenKeyboardHome("NFT", "Личный кабинет", "Информация", "Поддержка")
+				msg.Text = "Главное меню"
+			}
+			if needParams[1] == "en" {
+				msg.ReplyMarkup = keyboard.GenKeyboardHome("NFT", "Profile", "About", "Support")
+				msg.Text = "Main menu"
+			}
 		}
-		_, err := b.Bot.Send(msg)
+		_, err = b.Bot.Send(msg)
 		if err != nil {
 			return err
 		}
@@ -174,6 +253,77 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 			return err
 		}
 		err = withDrawPayment.WithDrawPayment(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
+		if err != nil {
+			return err
+		}
+	case "NM_NFT_COLL":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = nftCollection.NftCollection(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
+		if err != nil {
+			return err
+		}
+	case "NM_NFT_COLL_T":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = nftToken.NftToken(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
+		if err != nil {
+			return err
+		}
+	case "NM_NFT_COLL_TB":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = nftTokenBuy.NftTokenBuy(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
+		if err != nil {
+			return err
+		}
+	case "NM_WORKPANEL":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = workerPanel.WorkerPanel(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
+		if err != nil {
+			return err
+		}
+	case "NM_WORKPANEL_MAM_US":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		i, err := strconv.ParseInt(needParams[1], 10, 64)
+		if err != nil {
+			return err
+		}
+		err = mammothProfile.MammothProfile(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, i)
+		if err != nil {
+			return err
+		}
+	case "NM_WORKPANEL_MAM":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = myMammoths.MyMammoths(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
+		if err != nil {
+			return err
+		}
+	case "NM_WORKPANEL_MAM_PREM":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		i, err := strconv.ParseInt(needParams[1], 10, 64)
+		if err != nil {
+			return err
+		}
+		err = changeMamPremium.ChangeMamPremium(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, i)
 		if err != nil {
 			return err
 		}
@@ -221,6 +371,11 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 		}
 	case "👨‍💻 Поддержка":
 		err := support.Support(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+		if err != nil {
+			return err
+		}
+	case "🛠 Панель воркера":
+		err := workerPanel.WorkerPanel(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
 		if err != nil {
 			return err
 		}

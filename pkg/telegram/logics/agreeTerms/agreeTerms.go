@@ -11,6 +11,7 @@ import (
 )
 
 func AgreeTerms(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.MessageConfig, teleId int64, userName string, currencyChoose string) error {
+	fmt.Println("currencyChoose -->", currencyChoose)
 	if len(currencyChoose) > 0 {
 		resUpdateCurrency, err := requestProject.UpdateCurrency(teleId, currencyChoose)
 		if err != nil {
@@ -24,7 +25,7 @@ func AgreeTerms(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.MessageConf
 			fmt.Println("resGetUserLang -->", resGetUserLang)
 			if resGetUserLang == "ru" {
 				msg.ParseMode = "HTML"
-				var text string = "Подтвердите, что вы не бот.\n\nНажмимая “Подтвердить“, Вы принимаете условия <a href='https://google.com'>пользовательского соглашения</a>."
+				var text string = "Подтвердите, что вы не бот.\n\nНажмимая “Подтвердить“, Вы принимаете условия <a href='https://static.rarible.com/terms.pdf'>пользовательского соглашения</a>, <a href='https://static.rarible.com/privacy.pdf'>Условия конфиденциальности</a>."
 				msg.ReplyMarkup = keyboard.GenKeyboardInlineForAgreeTerms("✅ Подтвердить", true, resGetUserLang)
 				msg.Text = text
 				_, err := bot.Send(msg)
@@ -34,7 +35,7 @@ func AgreeTerms(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.MessageConf
 			}
 			if resGetUserLang == "en" {
 				msg.ParseMode = "HTML"
-				var text string = "Please, confirm you're not a robot.\n\nBy pressing “Accept“ you confirm that you've read and accept our <a href='https://google.com'>User Agreement</a>."
+				var text string = "Please, confirm you're not a robot.\n\nBy pressing “Accept“ you confirm that you've read and accept our <a href='https://static.rarible.com/terms.pdf'>Terms</a>, <a href='https://static.rarible.com/privacy.pdf'>Privacy</a>."
 				msg.ReplyMarkup = keyboard.GenKeyboardInlineForAgreeTerms("✅ Accept", true, resGetUserLang)
 				msg.Text = text
 				_, err := bot.Send(msg)
