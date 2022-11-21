@@ -37,6 +37,9 @@ func CheckAuth(teleId int64) (bool, error) {
 		return false, err
 	}
 	defer response.Body.Close()
+	fmt.Println("CheckAuth response ->", response)
+	fmt.Println("CheckAuth response.Body ->", response.Body)
+	fmt.Println("CheckAuth response.StatusCode ->", response.StatusCode)
 	if response.StatusCode == 200 {
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
