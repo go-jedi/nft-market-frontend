@@ -34,7 +34,7 @@ func GenKeyboardInlineForNftMenu(collections []requestProject.Collection, textBt
 func GenKeyboardInlineForSupportMenu(textSupport string, textBackProfile string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/LooksRareHelp"),
+			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/mySupportWorkBot"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(textBackProfile, "NM_PROFILE"),
@@ -45,13 +45,13 @@ func GenKeyboardInlineForSupportMenu(textSupport string, textBackProfile string)
 func GenKeyboardInlineForAboutMenu(textSupport string, textNews string, textReport string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/LooksRareHelp"),
+			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/mySupportWorkBot"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonURL(textNews, "https://looksrare.org/"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL(textReport, "https://t.me/LooksRareHelp"),
+			tgbotapi.NewInlineKeyboardButtonURL(textReport, "https://t.me/mySupportWorkBot"),
 		),
 	)
 }
@@ -94,7 +94,7 @@ func GenKeyboardInlineForDeposit(textBackProfile string) tgbotapi.InlineKeyboard
 func GenKeyboardInlineForDepositPayment(textSupport string, textBackProfile string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/LooksRareHelp"),
+			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/mySupportWorkBot"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(textBackProfile, "NM_PROFILE"),
@@ -113,7 +113,7 @@ func GenKeyboardInlineForMyNfts(textBackProfile string) tgbotapi.InlineKeyboardM
 func GenKeyboardInlineForVerification(textSupport string, textBackProfile string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/LooksRareHelp"),
+			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/mySupportWorkBot"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(textBackProfile, "NM_PROFILE"),
@@ -141,7 +141,7 @@ func GenKeyboardInlineForWithDraw(textBackProfile string) tgbotapi.InlineKeyboar
 func GenKeyboardInlineForWithDrawPayment(textSupport string, textBackProfile string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/LooksRareHelp"),
+			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/mySupportWorkBot"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(textBackProfile, "NM_PROFILE"),
