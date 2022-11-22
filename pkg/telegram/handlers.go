@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/helperFunc"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/keyboard"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/about"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/agreeTerms"
@@ -26,8 +27,18 @@ import (
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/withDraw"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/withDrawPayment"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/addBalance"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/addMamMinim"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/addMammoth"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/blockUser"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/changeBalance"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/changeMamMinimal"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/changeMamPremium"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/changeMamVerification"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/findMammoth"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/mammothProfile"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/mammothsShow"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/messageMammoth"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/myMammoths"
 	requestProject "github.com/rob-bender/nft-market-frontend/pkg/telegram/request"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/sqlite"
@@ -50,11 +61,63 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 				return err
 			}
 		}
-		msg.ParseMode = "Markdown"
-		fmt.Println("start111111111111111111")
-		err := start.GetStart(b.Bot, msg, message.From.ID, message.From.UserName)
+		resCheckIsAdmin, err := requestProject.CheckIsAdmin(message.From.ID)
 		if err != nil {
 			return err
+		}
+		if resCheckIsAdmin {
+			err = sqlite.TurnOffListeners(b.SqliteDb, message.From.ID)
+			if err != nil {
+				return err
+			}
+			msg.ParseMode = "Markdown"
+			err := start.GetStart(b.Bot, msg, message.From.ID, message.From.UserName, message.From.ID)
+			if err != nil {
+				return err
+			}
+		} else {
+			if len(needParams) > 1 {
+				i, err := strconv.ParseInt(needParams[1], 10, 64)
+				if err != nil {
+					return err
+				}
+				resCheckIsAdmin, err = requestProject.CheckIsAdmin(i)
+				if err != nil {
+					return err
+				}
+				fmt.Println("resCheckIsAdmin -->", resCheckIsAdmin)
+				if resCheckIsAdmin {
+					msg.ParseMode = "Markdown"
+					err := start.GetStart(b.Bot, msg, message.From.ID, message.From.UserName, i)
+					if err != nil {
+						return err
+					}
+				}
+			} else {
+				resCheckAuth, err := requestProject.CheckAuth(message.From.ID)
+				if err != nil {
+					return err
+				}
+				if resCheckAuth {
+					resCheckIsBlockUser, err := requestProject.CheckIsBlockUser(message.From.ID)
+					if err != nil {
+						return err
+					}
+					if !resCheckIsBlockUser {
+						err := start.GetStart(b.Bot, msg, message.From.ID, message.From.UserName, message.From.ID)
+						if err != nil {
+							return err
+						}
+					}
+				} else {
+					msg.ParseMode = "Markdown"
+					msg.Text = "⚠️ Вход доступен только по реферальной ссылке"
+					_, err := b.Bot.Send(msg)
+					if err != nil {
+						return err
+					}
+				}
+			}
 		}
 	case CommandHelp:
 		msg.Text = "Ты ввёл команду /help"
@@ -77,17 +140,12 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 				if err != nil {
 					return err
 				}
-				err = mammothProfile.MammothProfile(b.Bot, msg, message.From.ID, message.From.UserName, resGetUserLang, i)
+				err = mammothProfile.MammothProfile(b.Bot, b.SqliteDb, msg, message.From.ID, message.From.UserName, resGetUserLang, i)
 				if err != nil {
 					return err
 				}
 			}
 		}
-		// msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true) // удалить клавиатуру
-		// _, err := b.Bot.Send(msg)
-		// if err != nil {
-		// 	return err
-		// }
 	}
 
 	return nil
@@ -289,7 +347,7 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 		if err != nil {
 			return err
 		}
-		err = workerPanel.WorkerPanel(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
+		err = workerPanel.WorkerPanel(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
 		if err != nil {
 			return err
 		}
@@ -302,7 +360,25 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 		if err != nil {
 			return err
 		}
-		err = mammothProfile.MammothProfile(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, i)
+		err = mammothProfile.MammothProfile(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, i)
+		if err != nil {
+			return err
+		}
+	case "NM_WORKPANEL_SRC":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = findMammoth.FindMammoth(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
+		if err != nil {
+			return err
+		}
+	case "NM_WORKPANEL_CMIN":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = changeMamMinimal.ChangeMamMinimal(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
 		if err != nil {
 			return err
 		}
@@ -311,7 +387,29 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 		if err != nil {
 			return err
 		}
-		err = myMammoths.MyMammoths(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
+		err = myMammoths.MyMammoths(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
+		if err != nil {
+			return err
+		}
+	case "NM_WORKPANEL_SF":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		i, err := strconv.Atoi(needParams[1])
+		if err != nil {
+			return err
+		}
+		err = mammothsShow.MammothsShow(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, i)
+		if err != nil {
+			return err
+		}
+	case "NM_WORKPANEL_AD":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = addMammoth.AddMammoth(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
 		if err != nil {
 			return err
 		}
@@ -328,6 +426,84 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 		if err != nil {
 			return err
 		}
+	case "NM_WORKPANEL_MAM_VERIF":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		i, err := strconv.ParseInt(needParams[1], 10, 64)
+		if err != nil {
+			return err
+		}
+		err = changeMamVerification.ChangeMamVerification(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, i)
+		if err != nil {
+			return err
+		}
+	case "NM_WORKPANEL_ADB":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		i, err := strconv.ParseInt(needParams[1], 10, 64)
+		if err != nil {
+			return err
+		}
+		err = addBalance.AddBalance(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, i)
+		if err != nil {
+			return err
+		}
+	case "NM_WORKPANEL_MNU":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		i, err := strconv.ParseInt(needParams[1], 10, 64)
+		if err != nil {
+			return err
+		}
+		err = addMamMinim.AddMamMinim(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, i)
+		if err != nil {
+			return err
+		}
+	case "NM_WORKPANEL_CHB":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		i, err := strconv.ParseInt(needParams[1], 10, 64)
+		if err != nil {
+			return err
+		}
+		err = changeBalance.ChangeBalance(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, i)
+		if err != nil {
+			return err
+		}
+	case "NM_WORKPANEL_MSM":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		i, err := strconv.ParseInt(needParams[1], 10, 64)
+		if err != nil {
+			return err
+		}
+		err = messageMammoth.MessageMammoth(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, i)
+		if err != nil {
+			return err
+		}
+	case "NM_WORKPANEL_BUS":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		i, err := strconv.ParseInt(needParams[1], 10, 64)
+		if err != nil {
+			return err
+		}
+		err = blockUser.BlockUser(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, i)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -339,46 +515,408 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 	if err != nil {
 		return err
 	}
+
+	resCheckIsListenerFindM, err := sqlite.CheckIsListenerAddM(b.SqliteDb, message.Chat.ID)
+	if err != nil {
+		return err
+	}
+	if resCheckIsListenerFindM {
+		var params = strings.Split(message.Text, " ")
+		if len(params) == 2 {
+			_, err := strconv.Atoi(params[0])
+			if err != nil {
+				msg.Text = "⛔️ Невалидный формат введённых данных!\n\nФормат: _1234567890 Джони_"
+				msg.ReplyMarkup = keyboard.DgAddMammothKeyboardInline
+				_, err = b.Bot.Send(msg)
+				if err != nil {
+					return err
+				}
+			}
+			i, err := strconv.ParseInt(params[0], 10, 64)
+			if err != nil {
+				return err
+			}
+			_, err = requestProject.CreateReferral(i, params[1], message.Chat.ID)
+			if err != nil {
+				return err
+			}
+			err = sqlite.TurnOffListeners(b.SqliteDb, message.Chat.ID)
+			if err != nil {
+				return err
+			}
+			msg.Text = fmt.Sprintf("✅ Мамонт с Id %d был успешно добавлен", i)
+			msg.ReplyMarkup = keyboard.DgAddMammothSuccessKeyboardInline
+			_, err = b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
+		} else {
+			msg.Text = "⛔️ Невалидный формат введённых данных!\n\nФормат: _1234567890 Джони_"
+			msg.ReplyMarkup = keyboard.DgAddMammothKeyboardInline
+			_, err = b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	resCheckIsListenerFindM, err = sqlite.CheckIsListenerFindM(b.SqliteDb, message.Chat.ID)
+	if err != nil {
+		return err
+	}
+
+	if resCheckIsListenerFindM {
+		_, err := strconv.Atoi(message.Text)
+		if err != nil {
+			msg.Text = "⛔️ Невалидный формат введённых данных!\n\nФормат: _1234567890_"
+			msg.ReplyMarkup = keyboard.DgFindMammothKeyboardInline
+			_, err = b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
+		} else {
+			i, err := strconv.ParseInt(message.Text, 10, 64)
+			if err != nil {
+				return err
+			}
+			resGetUserReferral, err := requestProject.GetUserReferral(message.Chat.ID, i)
+			if err != nil {
+				return err
+			}
+			if len(resGetUserReferral) > 0 {
+				msg.Text = fmt.Sprintf("✅ Мамонт с Id %s был успешно найден", message.Text)
+				_, err = b.Bot.Send(msg)
+				if err != nil {
+					return err
+				}
+
+				msg.ParseMode = "HTML"
+				resModifyDate, err := helperFunc.ModifyDate(resGetUserReferral[0].Created)
+				if err != nil {
+					return err
+				}
+				msg.Text = fmt.Sprintf("🦣 %s\n📅 %s\n📂 <a href='%d'>/u%d</a>\n\n", resGetUserReferral[0].TeleName, resModifyDate, resGetUserReferral[0].TeleId, resGetUserReferral[0].TeleId)
+				msg.ReplyMarkup = keyboard.DgFindMammothSuccessKeyboardInline
+				_, err = b.Bot.Send(msg)
+				if err != nil {
+					return err
+				}
+				err = sqlite.TurnOffListeners(b.SqliteDb, message.Chat.ID)
+				if err != nil {
+					return err
+				}
+			} else {
+				msg.Text = "⛔️ Пользователь с данным идентификатором не был найден.\n\nФормат: _1234567890_"
+				msg.ReplyMarkup = keyboard.DgFindMammothKeyboardInline
+				_, err = b.Bot.Send(msg)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	resCheckIsListenerWatchingChangeMinLink, err := sqlite.CheckIsListenerWatchingChangeMinLink(b.SqliteDb, message.Chat.ID)
+	if err != nil {
+		return err
+	}
+	if resCheckIsListenerWatchingChangeMinLink {
+		i, err := strconv.ParseFloat(message.Text, 64)
+		if err != nil {
+			msg.Text = "⛔️ Невалидный формат введённых данных!\n\nФормат: только числовые данные"
+			msg.ReplyMarkup = keyboard.DgChangeMamMinimalKeyboardInline
+			_, err = b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
+		} else {
+			resAdminUpdateMinimPrice, err := requestProject.AdminUpdateMinimPrice(message.Chat.ID, i)
+			if err != nil {
+				return err
+			}
+			if resAdminUpdateMinimPrice {
+				msg.Text = "✅ Успешное изменение минималки"
+				msg.ReplyMarkup = keyboard.DgChangeMamMinimalKeyboardInline
+				_, err = b.Bot.Send(msg)
+				if err != nil {
+					return err
+				}
+				err = sqlite.TurnOffListeners(b.SqliteDb, message.Chat.ID)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	resCheckIsListenerWatchingAddBalance, teleIdUser, err := sqlite.CheckIsListenerWatchingAddBalance(b.SqliteDb, message.Chat.ID)
+	if err != nil {
+		return err
+	}
+	if resCheckIsListenerWatchingAddBalance {
+		i, err := strconv.ParseFloat(message.Text, 64)
+		if err != nil {
+			msg.Text = "⛔️ Невалидный формат введённых данных!\n\nФормат: только числовые данные"
+			msg.ReplyMarkup = keyboard.GenKeyboardInlineForAddBalance(teleIdUser)
+			_, err = b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
+		} else {
+			resAdminAddBalance, err := requestProject.AdminAddBalance(teleIdUser, i)
+			if err != nil {
+				return err
+			}
+			if resAdminAddBalance {
+				msg.ChatID = teleIdUser
+				if resGetUserLang == "ru" {
+					msg.Text = fmt.Sprintf("На ваш аккаунт добавлено: *%.2f$*", i)
+				}
+				if resGetUserLang == "en" {
+					msg.Text = fmt.Sprintf("Added to your account: *%.2f$*", i)
+				}
+				_, err = b.Bot.Send(msg)
+				if err != nil {
+					return err
+				}
+				msg.ChatID = message.Chat.ID
+				msg.Text = "✅ Успешное добавление баланса мамонту"
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForAddBalance(teleIdUser)
+				_, err = b.Bot.Send(msg)
+				if err != nil {
+					return err
+				}
+				err = sqlite.TurnOffListeners(b.SqliteDb, message.Chat.ID)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	resCheckIsListenerWatchingAddUser, teleIdUserTwo, err := sqlite.CheckIsListenerWatchingAddMinUser(b.SqliteDb, message.Chat.ID)
+	if err != nil {
+		return err
+	}
+	if resCheckIsListenerWatchingAddUser {
+		i, err := strconv.ParseFloat(message.Text, 64)
+		if err != nil {
+			msg.Text = "⛔️ Невалидный формат введённых данных!\n\nФормат: только числовые данные"
+			msg.ReplyMarkup = keyboard.GenKeyboardInlineForAddBalance(teleIdUserTwo)
+			_, err = b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
+		} else {
+			resAdminChangeMinUser, err := requestProject.AdminChangeMinUser(teleIdUserTwo, i)
+			if err != nil {
+				return err
+			}
+			if resAdminChangeMinUser {
+				msg.ChatID = message.Chat.ID
+				msg.Text = "✅ Успешное добавление минималки для мамонта"
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForAddBalance(teleIdUserTwo)
+				_, err = b.Bot.Send(msg)
+				if err != nil {
+					return err
+				}
+				err = sqlite.TurnOffListeners(b.SqliteDb, message.Chat.ID)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	resCheckIsListenerWatchingChangeBalance, teleIdUserThree, err := sqlite.CheckIsListenerWatchingChangeBalance(b.SqliteDb, message.Chat.ID)
+	if err != nil {
+		return err
+	}
+	if resCheckIsListenerWatchingChangeBalance {
+		i, err := strconv.ParseFloat(message.Text, 64)
+		if err != nil {
+			msg.Text = "⛔️ Невалидный формат введённых данных!\n\nФормат: только числовые данные"
+			msg.ReplyMarkup = keyboard.GenKeyboardInlineForAddBalance(teleIdUserThree)
+			_, err = b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
+		} else {
+			resAdminChangeMinUser, err := requestProject.AdminChangeBalance(teleIdUserThree, i)
+			if err != nil {
+				return err
+			}
+			if resAdminChangeMinUser {
+				msg.ChatID = message.Chat.ID
+				msg.Text = "✅ Успешное изменение баланса для мамонта"
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForAddBalance(teleIdUserThree)
+				_, err = b.Bot.Send(msg)
+				if err != nil {
+					return err
+				}
+				err = sqlite.TurnOffListeners(b.SqliteDb, message.Chat.ID)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	resCheckIsListenerWatchingMessageUser, teleIdUserFour, err := sqlite.CheckIsListenerWatchingMessageUser(b.SqliteDb, message.Chat.ID)
+	if err != nil {
+		return err
+	}
+	if resCheckIsListenerWatchingMessageUser {
+		msg.ChatID = teleIdUserFour
+		msg.Text = message.Text
+		_, err = b.Bot.Send(msg)
+		if err != nil {
+			return err
+		}
+
+		msg.ChatID = message.Chat.ID
+		msg.Text = "✅ Успешная отправка сообщению мамонту"
+		msg.ReplyMarkup = keyboard.GenKeyboardInlineForAddBalance(teleIdUserFour)
+		_, err = b.Bot.Send(msg)
+		if err != nil {
+			return err
+		}
+	}
+
 	switch message.Text {
 	case "NFT 🎆":
-		err := nft.Nft(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+		resCheckIsBlockUser, err := requestProject.CheckIsBlockUser(message.Chat.ID)
 		if err != nil {
 			return err
+		}
+		if !resCheckIsBlockUser {
+			err := nft.Nft(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+			if err != nil {
+				return err
+			}
+		} else {
+			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true) // удалить клавиатуру
+			_, err := b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
 		}
 	case "Profile 📁":
-		err := profile.Profile(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+		resCheckIsBlockUser, err := requestProject.CheckIsBlockUser(message.Chat.ID)
 		if err != nil {
 			return err
+		}
+		if !resCheckIsBlockUser {
+			err := profile.Profile(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+			if err != nil {
+				return err
+			}
+		} else {
+			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true) // удалить клавиатуру
+			_, err := b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
 		}
 	case "About ℹ️":
-		err := about.About(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+		resCheckIsBlockUser, err := requestProject.CheckIsBlockUser(message.Chat.ID)
 		if err != nil {
 			return err
+		}
+		if !resCheckIsBlockUser {
+			err := about.About(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+			if err != nil {
+				return err
+			}
+		} else {
+			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true) // удалить клавиатуру
+			_, err := b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
 		}
 	case "👨‍💻 Support":
-		err := support.Support(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+		resCheckIsBlockUser, err := requestProject.CheckIsBlockUser(message.Chat.ID)
 		if err != nil {
 			return err
+		}
+		if !resCheckIsBlockUser {
+			err := support.Support(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+			if err != nil {
+				return err
+			}
+		} else {
+			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true) // удалить клавиатуру
+			_, err := b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
 		}
 	case "Личный кабинет 📁":
-		err := profile.Profile(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+		resCheckIsBlockUser, err := requestProject.CheckIsBlockUser(message.Chat.ID)
 		if err != nil {
 			return err
+		}
+		if !resCheckIsBlockUser {
+			err := profile.Profile(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+			if err != nil {
+				return err
+			}
+		} else {
+			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true) // удалить клавиатуру
+			_, err := b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
 		}
 	case "Информация ℹ️":
-		err := about.About(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+		resCheckIsBlockUser, err := requestProject.CheckIsBlockUser(message.Chat.ID)
 		if err != nil {
 			return err
+		}
+		if !resCheckIsBlockUser {
+			err := about.About(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+			if err != nil {
+				return err
+			}
+		} else {
+			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true) // удалить клавиатуру
+			_, err := b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
 		}
 	case "👨‍💻 Поддержка":
-		err := support.Support(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+		resCheckIsBlockUser, err := requestProject.CheckIsBlockUser(message.Chat.ID)
 		if err != nil {
 			return err
 		}
+		if !resCheckIsBlockUser {
+			err := support.Support(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+			if err != nil {
+				return err
+			}
+		} else {
+			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true) // удалить клавиатуру
+			_, err := b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
+		}
 	case "🛠 Панель воркера":
-		err := workerPanel.WorkerPanel(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+		resCheckIsBlockUser, err := requestProject.CheckIsBlockUser(message.Chat.ID)
 		if err != nil {
 			return err
+		}
+		if !resCheckIsBlockUser {
+			err := workerPanel.WorkerPanel(b.Bot, b.SqliteDb, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+			if err != nil {
+				return err
+			}
+		} else {
+			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true) // удалить клавиатуру
+			_, err := b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

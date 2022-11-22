@@ -11,8 +11,9 @@ type UserCheckAuthResponse struct {
 }
 
 type UserRegister struct {
-	TeleId   int64  `json:"tele_id"`
-	TeleName string `json:"tele_name"`
+	TeleId      int64  `json:"tele_id"`
+	TeleName    string `json:"tele_name"`
+	TeleIdAdmin int64  `json:"tele_id_admin"`
 }
 
 type UserRegisterResponse struct {
@@ -96,18 +97,32 @@ type UserGetUserProfile struct {
 }
 
 type UserProfile struct {
-	Id           int   `json:"id"`
-	TeleId       int64 `json:"tele_id"`
-	Balance      int64 `json:"balance"`
-	IsPremium    bool  `json:"is_premium"`
-	Conclusion   int64 `json:"conclusion"`
-	Verification bool  `json:"verification"`
+	Id           int     `json:"id"`
+	TeleId       int64   `json:"tele_id"`
+	Balance      float64 `json:"balance"`
+	IsPremium    bool    `json:"is_premium"`
+	Conclusion   float64 `json:"conclusion"`
+	Verification bool    `json:"verification"`
 }
 
 type UserGetUserProfileResponse struct {
 	Status  int           `json:"status"`
 	Message string        `json:"message"`
 	Result  []UserProfile `json:"result"`
+}
+
+type UserGetUserMinPrice struct {
+	TeleId int64 `json:"tele_id"`
+}
+
+type UserMinPrice struct {
+	MinimPrice float64 `json:"minim_price"`
+}
+
+type UserGetUserMinPriceResponse struct {
+	Status  int            `json:"status"`
+	Message string         `json:"message"`
+	Result  []UserMinPrice `json:"result"`
 }
 
 type Payment struct {
@@ -196,8 +211,18 @@ type UserCreateReferralResponse struct {
 	Message string `json:"message"`
 }
 
-type UserGetUserReferral struct {
+type UserCheckUserReferral struct {
 	TeleId int64 `json:"tele_id"`
+}
+
+type Count struct {
+	Count int64 `json:"count"`
+}
+
+type UserCheckUserReferralResponse struct {
+	Status  int     `json:"status"`
+	Message string  `json:"message"`
+	Result  []Count `json:"result"`
 }
 
 type Referral struct {
@@ -208,7 +233,23 @@ type Referral struct {
 	AdminReferral int64  `json:"admin_referral"`
 }
 
+type UserGetUserReferral struct {
+	TeleId     int64 `json:"tele_id"`
+	TeleIdUser int64 `json:"tele_id_user"`
+}
+
 type UserGetUserReferralResponse struct {
+	Status  int        `json:"status"`
+	Message string     `json:"message"`
+	Result  []Referral `json:"result"`
+}
+
+type UserGetUsersReferral struct {
+	TeleId int64 `json:"tele_id"`
+	Limit  int   `json:"limit"`
+}
+
+type UserGetUsersReferralResponse struct {
 	Status  int        `json:"status"`
 	Message string     `json:"message"`
 	Result  []Referral `json:"result"`
@@ -219,13 +260,13 @@ type AdminUserProfileGet struct {
 }
 
 type AdminUserProfile struct {
-	Id           int64  `json:"id"`
-	TeleId       int64  `json:"tele_id"`
-	TeleName     string `json:"tele_name"`
-	Balance      int64  `json:"balance"`
-	IsPremium    bool   `json:"is_premium"`
-	Verification bool   `json:"verification"`
-	Conclusion   int64  `json:"conclusion"`
+	Id           int64   `json:"id"`
+	TeleId       int64   `json:"tele_id"`
+	TeleName     string  `json:"tele_name"`
+	Balance      float64 `json:"balance"`
+	IsPremium    bool    `json:"is_premium"`
+	Verification bool    `json:"verification"`
+	Conclusion   float64 `json:"conclusion"`
 }
 
 type AdminUserProfileGetResponse struct {
@@ -234,11 +275,99 @@ type AdminUserProfileGetResponse struct {
 	Result  []AdminUserProfile `json:"result"`
 }
 
+type UserAdminCheckIsPremium struct {
+	TeleId int64 `json:"tele_id"`
+}
+
+type UserAdminCheckIsPremiumResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Result  bool   `json:"result"`
+}
+
 type UserAdminUpdatePremium struct {
 	TeleId int64 `json:"tele_id"`
 }
 
 type UserAdminUpdatePremiumResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type UserAdminCheckIsVerified struct {
+	TeleId int64 `json:"tele_id"`
+}
+
+type UserAdminCheckIsVerifiedResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Result  bool   `json:"result"`
+}
+
+type UserAdminUpdateVerification struct {
+	TeleId int64 `json:"tele_id"`
+}
+
+type UserAdminUpdateVerificationResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type AdminUpdateMinPrice struct {
+	TeleId   int64   `json:"tele_id"`
+	MinPrice float64 `json:"min_price"`
+}
+
+type AdminUpdateMinPriceResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type UserAdminAdBalance struct {
+	TeleId    int64   `json:"tele_id"`
+	NeedPrice float64 `json:"need_price"`
+}
+
+type UserAdminAdBalanceResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type UserAdminChangeMinUser struct {
+	TeleId   int64   `json:"tele_id"`
+	MinPrice float64 `json:"min_price"`
+}
+
+type UserAdminChangeMinUserResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type UserAdminChangeBalance struct {
+	TeleId    int64   `json:"tele_id"`
+	NeedPrice float64 `json:"need_price"`
+}
+
+type UserAdminChangeBalanceResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type UserCheckIsBlockUser struct {
+	TeleId int64 `json:"tele_id"`
+}
+
+type UserCheckIsBlockUserResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Result  bool   `json:"result"`
+}
+
+type UserBlockUser struct {
+	TeleId int64 `json:"tele_id"`
+}
+
+type UserBlockUserResponse struct {
 	Status  int    `json:"status"`
 	Message string `json:"message"`
 }

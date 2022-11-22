@@ -189,24 +189,62 @@ func GenKeyboardInlineForWorkerPanel() tgbotapi.InlineKeyboardMarkup {
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("🦣 Мои мамонты", "NM_WORKPANEL_MAM"),
 		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("🔍 Поиск", "NM_WORKPANEL_SRC"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("💸 Изменить минималку", "NM_WORKPANEL_CMIN"),
+		),
 	)
 }
 
 func GenKeyboardInlineForMyMammoths() tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("5️⃣ Последние 5", "NM_WORKPANEL_SF?5"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("5️⃣0️⃣ Последние 50", "NM_WORKPANEL_SF?50"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("➕ Добавить", "NM_WORKPANEL_AD"),
+		),
+		// tgbotapi.NewInlineKeyboardRow(
+		// tgbotapi.NewInlineKeyboardButtonData("💥 Удалить всех мамонтов", "NM_WORKPANEL_DAM"),
+		// ),
+		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("🔙 В меню", "NM_WORKPANEL"),
 		),
 	)
 }
 
-func GenKeyboardInlineForMammothProfile(teleId int64, textPremium string) tgbotapi.InlineKeyboardMarkup {
+func GenKeyboardInlineForMammothProfile(teleId int64, verificationText string, textPremium string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(verificationText, fmt.Sprintf("NM_WORKPANEL_MAM_VERIF?%d", teleId)),
+		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(textPremium, fmt.Sprintf("NM_WORKPANEL_MAM_PREM?%d", teleId)),
 		),
 		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("💰 Пополнить баланс", fmt.Sprintf("NM_WORKPANEL_ADB?%d", teleId)),
+			tgbotapi.NewInlineKeyboardButtonData("📥 Минималка", fmt.Sprintf("NM_WORKPANEL_MNU?%d", teleId)),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("💸 Изменить баланс", fmt.Sprintf("NM_WORKPANEL_CHB?%d", teleId)),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("✉️ Сообщение мамонту", fmt.Sprintf("NM_WORKPANEL_MSM?%d", teleId)),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("♻️ Обновить", fmt.Sprintf("NM_WORKPANEL_MAM_US?%d", teleId)),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("❌ Заблокировать мамонта", fmt.Sprintf("NM_WORKPANEL_BUS?%d", teleId)),
+		),
+		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("🔙 В меню", "NM_WORKPANEL"),
+			// tgbotapi.NewInlineKeyboardButtonData("🔍 Искать еще", "NM_WORKPANEL"),
 		),
 	)
 }
@@ -215,6 +253,22 @@ func GenKeyboardInlineForChangeMamPremium(teleId int64) tgbotapi.InlineKeyboardM
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Вернуться к пользователю", fmt.Sprintf("NM_WORKPANEL_MAM_US?%d", teleId)),
+		),
+	)
+}
+
+func GenKeyboardInlineForChangeMamVerification(teleId int64) tgbotapi.InlineKeyboardMarkup {
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Вернуться к пользователю", fmt.Sprintf("NM_WORKPANEL_MAM_US?%d", teleId)),
+		),
+	)
+}
+
+func GenKeyboardInlineForAddBalance(teleId int64) tgbotapi.InlineKeyboardMarkup {
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("🔙 Назад в профиль", fmt.Sprintf("NM_WORKPANEL_MAM_US?%d", teleId)),
 		),
 	)
 }

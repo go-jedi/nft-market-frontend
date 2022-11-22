@@ -56,11 +56,12 @@ func CheckAuth(teleId int64) (bool, error) {
 	return false, nil
 }
 
-func RegisterUser(teleId int64, teleName string) (bool, error) {
+func RegisterUser(teleId int64, teleName string, teleIdAdmin int64) (bool, error) {
 	checkNeedBase(os.Getenv("IS_TESTING"), "user/registration")
 	userRegister := UserRegister{
-		TeleId:   teleId,
-		TeleName: teleName,
+		TeleId:      teleId,
+		TeleName:    teleName,
+		TeleIdAdmin: teleIdAdmin,
 	}
 	userRegisterJson, err := json.Marshal(userRegister)
 	if err != nil {
@@ -319,6 +320,38 @@ func GetUserProfile(teleId int64) ([]UserProfile, error) {
 	return []UserProfile{}, nil
 }
 
+func GetUserMinPrice(teleId int64) ([]UserMinPrice, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "user/getUserMinPrice")
+	userGetUserMinPrice := UserGetUserMinPrice{
+		TeleId: teleId,
+	}
+	userGetUserMinPriceJson, err := json.Marshal(userGetUserMinPrice)
+	if err != nil {
+		return []UserMinPrice{}, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userGetUserMinPriceJson))
+	if err != nil {
+		return []UserMinPrice{}, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return []UserMinPrice{}, err
+		}
+		var userGetUserMinPriceResponse UserGetUserMinPriceResponse
+		err = json.Unmarshal([]byte(body), &userGetUserMinPriceResponse)
+		if err != nil {
+			return []UserMinPrice{}, err
+		}
+		if userGetUserMinPriceResponse.Status == 200 && len(userGetUserMinPriceResponse.Result) > 0 {
+			return userGetUserMinPriceResponse.Result, nil
+		}
+	}
+
+	return []UserMinPrice{}, nil
+}
+
 func GetAllPayments() ([]Payment, error) {
 	checkNeedBase(os.Getenv("IS_TESTING"), "payment/getAll")
 	response, err := http.Get(baseUrl)
@@ -499,10 +532,43 @@ func CreateReferral(teleId int64, teleName string, adminReferral int64) (bool, e
 	return false, nil
 }
 
-func GetUserReferral(teleId int64) ([]Referral, error) {
+func CheckUserReferral(teleId int64) ([]Count, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/checkUserReferral")
+	userCheckUserReferral := UserCheckUserReferral{
+		TeleId: teleId,
+	}
+	userCheckUserReferralJson, err := json.Marshal(userCheckUserReferral)
+	if err != nil {
+		return []Count{}, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userCheckUserReferralJson))
+	if err != nil {
+		return []Count{}, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return []Count{}, err
+		}
+		var userCheckUserReferralResponse UserCheckUserReferralResponse
+		err = json.Unmarshal([]byte(body), &userCheckUserReferralResponse)
+		if err != nil {
+			return []Count{}, err
+		}
+		if userCheckUserReferralResponse.Status == 200 && len(userCheckUserReferralResponse.Result) > 0 {
+			return userCheckUserReferralResponse.Result, nil
+		}
+	}
+
+	return []Count{}, nil
+}
+
+func GetUserReferral(teleId int64, teleIdUser int64) ([]Referral, error) {
 	checkNeedBase(os.Getenv("IS_TESTING"), "admin/getUserReferral")
 	userGetUserReferral := UserGetUserReferral{
-		TeleId: teleId,
+		TeleId:     teleId,
+		TeleIdUser: teleIdUser,
 	}
 	userGetUserReferralJson, err := json.Marshal(userGetUserReferral)
 	if err != nil {
@@ -531,6 +597,39 @@ func GetUserReferral(teleId int64) ([]Referral, error) {
 	return []Referral{}, nil
 }
 
+func GetUsersReferral(teleId int64, limit int) ([]Referral, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/getUsersReferral")
+	userGetUsersReferral := UserGetUsersReferral{
+		TeleId: teleId,
+		Limit:  limit,
+	}
+	userGetUsersReferralJson, err := json.Marshal(userGetUsersReferral)
+	if err != nil {
+		return []Referral{}, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userGetUsersReferralJson))
+	if err != nil {
+		return []Referral{}, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return []Referral{}, err
+		}
+		var userGetUsersReferralResponse UserGetUsersReferralResponse
+		err = json.Unmarshal([]byte(body), &userGetUsersReferralResponse)
+		if err != nil {
+			return []Referral{}, err
+		}
+		if userGetUsersReferralResponse.Status == 200 && len(userGetUsersReferralResponse.Result) > 0 {
+			return userGetUsersReferralResponse.Result, nil
+		}
+	}
+
+	return []Referral{}, nil
+}
+
 func AdminGetUserProfile(teleId int64) ([]AdminUserProfile, error) {
 	checkNeedBase(os.Getenv("IS_TESTING"), "admin/getUserProfile")
 	AdminUserProfileGet := AdminUserProfileGet{
@@ -550,6 +649,7 @@ func AdminGetUserProfile(teleId int64) ([]AdminUserProfile, error) {
 		if err != nil {
 			return []AdminUserProfile{}, err
 		}
+		fmt.Println("body -->", string(body))
 		var adminUserProfileGetResponse AdminUserProfileGetResponse
 		err = json.Unmarshal([]byte(body), &adminUserProfileGetResponse)
 		if err != nil {
@@ -561,6 +661,38 @@ func AdminGetUserProfile(teleId int64) ([]AdminUserProfile, error) {
 	}
 
 	return []AdminUserProfile{}, nil
+}
+
+func AdminCheckIsPremium(teleId int64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/checkIsPremium")
+	userAdminCheckIsPremium := UserAdminCheckIsPremium{
+		TeleId: teleId,
+	}
+	userAdminCheckIsPremiumJson, err := json.Marshal(userAdminCheckIsPremium)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userAdminCheckIsPremiumJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userAdminCheckIsPremiumResponse UserAdminCheckIsPremiumResponse
+		err = json.Unmarshal([]byte(body), &userAdminCheckIsPremiumResponse)
+		if err != nil {
+			return false, err
+		}
+		if userAdminCheckIsPremiumResponse.Status == 200 && userAdminCheckIsPremiumResponse.Result {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 func AdminUpdatePremium(teleId int64) (bool, error) {
@@ -588,6 +720,266 @@ func AdminUpdatePremium(teleId int64) (bool, error) {
 			return false, err
 		}
 		if userAdminUpdatePremiumResponse.Status == 200 {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func AdminCheckIsVerified(teleId int64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/checkIsVerified")
+	userAdminCheckIsVerified := UserAdminCheckIsVerified{
+		TeleId: teleId,
+	}
+	userAdminCheckIsVerifiedJson, err := json.Marshal(userAdminCheckIsVerified)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userAdminCheckIsVerifiedJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userAdminCheckIsVerifiedResponse UserAdminCheckIsVerifiedResponse
+		err = json.Unmarshal([]byte(body), &userAdminCheckIsVerifiedResponse)
+		if err != nil {
+			return false, err
+		}
+		if userAdminCheckIsVerifiedResponse.Status == 200 && userAdminCheckIsVerifiedResponse.Result {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func AdminUpdateVerification(teleId int64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/updateVerification")
+	userAdminUpdateVerification := UserAdminUpdateVerification{
+		TeleId: teleId,
+	}
+	userAdminUpdateVerificationJson, err := json.Marshal(userAdminUpdateVerification)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userAdminUpdateVerificationJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userAdminUpdateVerificationResponse UserAdminUpdateVerificationResponse
+		err = json.Unmarshal([]byte(body), &userAdminUpdateVerificationResponse)
+		if err != nil {
+			return false, err
+		}
+		if userAdminUpdateVerificationResponse.Status == 200 {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func AdminUpdateMinimPrice(teleId int64, minPrice float64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/adminUpdateMinimPrice")
+	adminUpdateMinPrice := AdminUpdateMinPrice{
+		TeleId:   teleId,
+		MinPrice: minPrice,
+	}
+	adminUpdateMinPriceJson, err := json.Marshal(adminUpdateMinPrice)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(adminUpdateMinPriceJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var adminUpdateMinPriceResponse AdminUpdateMinPriceResponse
+		err = json.Unmarshal([]byte(body), &adminUpdateMinPriceResponse)
+		if err != nil {
+			return false, err
+		}
+		if adminUpdateMinPriceResponse.Status == 200 {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func AdminAddBalance(teleId int64, needPrice float64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/adminAddBalance")
+	userAdminAdBalance := UserAdminAdBalance{
+		TeleId:    teleId,
+		NeedPrice: needPrice,
+	}
+	userAdminAdBalanceJson, err := json.Marshal(userAdminAdBalance)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userAdminAdBalanceJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userAdminAdBalanceResponse UserAdminAdBalanceResponse
+		err = json.Unmarshal([]byte(body), &userAdminAdBalanceResponse)
+		if err != nil {
+			return false, err
+		}
+		if userAdminAdBalanceResponse.Status == 200 {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func AdminChangeMinUser(teleId int64, minPrice float64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/adminChangeMinUser")
+	userAdminChangeMinUser := UserAdminChangeMinUser{
+		TeleId:   teleId,
+		MinPrice: minPrice,
+	}
+	userAdminChangeMinUserJson, err := json.Marshal(userAdminChangeMinUser)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userAdminChangeMinUserJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userAdminChangeMinUserResponse UserAdminChangeMinUserResponse
+		err = json.Unmarshal([]byte(body), &userAdminChangeMinUserResponse)
+		if err != nil {
+			return false, err
+		}
+		if userAdminChangeMinUserResponse.Status == 200 {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func AdminChangeBalance(teleId int64, needPrice float64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/adminChangeBalance")
+	userAdminChangeBalance := UserAdminChangeBalance{
+		TeleId:    teleId,
+		NeedPrice: needPrice,
+	}
+	userAdminChangeBalanceJson, err := json.Marshal(userAdminChangeBalance)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userAdminChangeBalanceJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userAdminChangeBalanceResponse UserAdminChangeBalanceResponse
+		err = json.Unmarshal([]byte(body), &userAdminChangeBalanceResponse)
+		if err != nil {
+			return false, err
+		}
+		if userAdminChangeBalanceResponse.Status == 200 {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func CheckIsBlockUser(teleId int64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/checkIsBlockUser")
+	userCheckIsBlockUser := UserCheckIsBlockUser{
+		TeleId: teleId,
+	}
+	userCheckIsBlockUserJson, err := json.Marshal(userCheckIsBlockUser)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userCheckIsBlockUserJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userCheckIsBlockUserResponse UserCheckIsBlockUserResponse
+		err = json.Unmarshal([]byte(body), &userCheckIsBlockUserResponse)
+		if err != nil {
+			return false, err
+		}
+		if userCheckIsBlockUserResponse.Status == 200 && userCheckIsBlockUserResponse.Result {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func BlockUser(teleId int64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/blockUser")
+	userBlockUser := UserBlockUser{
+		TeleId: teleId,
+	}
+	userBlockUserJson, err := json.Marshal(userBlockUser)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userBlockUserJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userBlockUserResponse UserBlockUserResponse
+		err = json.Unmarshal([]byte(body), &userBlockUserResponse)
+		if err != nil {
+			return false, err
+		}
+		if userBlockUserResponse.Status == 200 {
 			return true, nil
 		}
 	}
