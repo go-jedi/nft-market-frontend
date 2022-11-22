@@ -1,8 +1,6 @@
 package changeMamPremium
 
 import (
-	"fmt"
-
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/keyboard"
 	requestProject "github.com/rob-bender/nft-market-frontend/pkg/telegram/request"
@@ -10,17 +8,42 @@ import (
 
 func ChangeMamPremium(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, userName string, languageUser string, userChooseTeleId int64) error {
 	if len(languageUser) > 0 {
-		resAdminUpdatePremium, err := requestProject.AdminUpdatePremium(userChooseTeleId)
+		resAdminCheckIsPremium, err := requestProject.AdminCheckIsPremium(userChooseTeleId)
 		if err != nil {
 			return err
 		}
-		fmt.Println("resAdminUpdatePremium -->", resAdminUpdatePremium)
-		if resAdminUpdatePremium {
-			msg.Text = "Успешное изменение премиума пользователя"
+		if resAdminCheckIsPremium {
+			msg.Text = "Аккаунт мамонта уже является премиум"
 			msg.ReplyMarkup = keyboard.GenKeyboardInlineForChangeMamPremium(userChooseTeleId)
 			_, err := bot.Send(msg)
 			if err != nil {
 				return err
+			}
+		} else {
+			resAdminUpdatePremium, err := requestProject.AdminUpdatePremium(userChooseTeleId)
+			if err != nil {
+				return err
+			}
+			if resAdminUpdatePremium {
+				msg.ChatID = userChooseTeleId
+				if languageUser == "ru" {
+					msg.Text = "Ваш аккаунта успешно переведён в премиум"
+				}
+				if languageUser == "en" {
+					msg.Text = "Your account has been successfully upgraded to Premium"
+				}
+				_, err := bot.Send(msg)
+				if err != nil {
+					return err
+				}
+
+				msg.ChatID = teleId
+				msg.Text = "Успешное изменение премиума пользователя"
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForChangeMamPremium(userChooseTeleId)
+				_, err = bot.Send(msg)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}

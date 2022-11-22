@@ -14,7 +14,6 @@ func Profile(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, use
 	if err != nil {
 		return err
 	}
-	fmt.Println("resGetUserProfile -->", resGetUserProfile)
 	if len(resGetUserProfile) > 0 {
 		var isTesting string = os.Getenv("IS_TESTING")
 		var needPath string = ""
@@ -41,7 +40,7 @@ func Profile(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, use
 			} else {
 				isPremium = "⭕️ *Не премиум*"
 			}
-			photo.Caption = fmt.Sprintf("*Личный кабинет*\n\nБаланс: *%d $*\nНа выводе: *%d $*\n\nВерификация: %s\nСтатус аккаунта: %s\nВаш ID: [%d](tg://user?id=%d)",
+			photo.Caption = fmt.Sprintf("*Личный кабинет*\n\nБаланс: *%.2f $*\nНа выводе: *%.2f $*\n\nВерификация: %s\nСтатус аккаунта: %s\nВаш ID: [%d](tg://user?id=%d)",
 				resGetUserProfile[0].Balance,
 				resGetUserProfile[0].Conclusion,
 				isVerification,
@@ -65,7 +64,7 @@ func Profile(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, use
 			} else {
 				isPremium = "⭕️ *Not premium*"
 			}
-			photo.Caption = fmt.Sprintf("*Personal account*\n\nBalance: *%d $*\nWithdrawal: *%d $*\n\nVerification: %s\nStatus Account: %s\nYour ID: [%d](tg://user?id=%d)",
+			photo.Caption = fmt.Sprintf("*Personal account*\n\nBalance: *%.2f $*\nWithdrawal: *%.2f $*\n\nVerification: %s\nStatus Account: %s\nYour ID: [%d](tg://user?id=%d)",
 				resGetUserProfile[0].Balance,
 				resGetUserProfile[0].Conclusion,
 				isVerification,

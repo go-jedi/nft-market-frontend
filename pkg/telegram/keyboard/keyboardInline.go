@@ -33,3 +33,33 @@ var DgCurrencyKeyboardInline = tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardButtonData("🇧🇾 BYN", "NM_CURRENCY?byn"),
 	),
 )
+
+var DgAddMammothKeyboardInline = tgbotapi.NewInlineKeyboardMarkup(
+	tgbotapi.NewInlineKeyboardRow(
+		tgbotapi.NewInlineKeyboardButtonData("🔙 Отменить добавление", "NM_WORKPANEL_MAM"),
+	),
+)
+
+var DgAddMammothSuccessKeyboardInline = tgbotapi.NewInlineKeyboardMarkup(
+	tgbotapi.NewInlineKeyboardRow(
+		tgbotapi.NewInlineKeyboardButtonData("🔙 К мамонтам", "NM_WORKPANEL_MAM"),
+	),
+)
+
+var DgFindMammothKeyboardInline = tgbotapi.NewInlineKeyboardMarkup(
+	tgbotapi.NewInlineKeyboardRow(
+		tgbotapi.NewInlineKeyboardButtonData("🔙 Отменить поиск", "NM_WORKPANEL"),
+	),
+)
+
+var DgFindMammothSuccessKeyboardInline = tgbotapi.NewInlineKeyboardMarkup(
+	tgbotapi.NewInlineKeyboardRow(
+		tgbotapi.NewInlineKeyboardButtonData("🔙 В меню", "NM_WORKPANEL"),
+	),
+)
+
+var DgChangeMamMinimalKeyboardInline = tgbotapi.NewInlineKeyboardMarkup(
+	tgbotapi.NewInlineKeyboardRow(
+		tgbotapi.NewInlineKeyboardButtonData("🔙 В меню", "NM_WORKPANEL"),
+	),
+)
