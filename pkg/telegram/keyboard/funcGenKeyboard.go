@@ -74,6 +74,27 @@ func GenKeyboardInlineForProfileMenu(textTopUp string, textWithdraw string, text
 	)
 }
 
+func GenKeyboardInlineForProfileMenuAdmin(textTopUp string, textWithdraw string, textMyNft string, textVerification string, textLanguaage string, languageUserChange string, hideText string) tgbotapi.InlineKeyboardMarkup {
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(textTopUp, "NM_TOP_UP"),
+			tgbotapi.NewInlineKeyboardButtonData(textWithdraw, "NM_WITH_DRAW"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(textMyNft, "NM_MY_NFT"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(textVerification, "NM_VERIF"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(textLanguaage, fmt.Sprintf("NM_CHNG_LANG?%s", languageUserChange)),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(hideText, fmt.Sprintf("NM_HIDE_NCK?%s", languageUserChange)),
+		),
+	)
+}
+
 func GenKeyboardInlineForDeposit(textBackProfile string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
