@@ -236,7 +236,7 @@ func CheckIsListenerWatchingMessageUser(sqliteDb *sql.DB, teleId int64) (bool, i
 }
 
 func TurnOffListeners(sqliteDb *sql.DB, teleId int64) error {
-	_, err := sqliteDb.Exec("UPDATE bot_params SET watching_add_mam = $1, watching_find_mam = $2, watching_change_minlink = $3, watching_add_balance = $4, watching_change_minuser = $5, watching_change_balance = $6, watching_message_user = $7, choose_tele_id = $8 WHERE tele_id = $9", 0, 0, 0, 0, 0, 0, 0, 0, teleId)
+	_, err := sqliteDb.Exec("UPDATE bot_params SET watching_write_price = $1, watching_add_mam = $2, watching_find_mam = $3, watching_change_minlink = $4, watching_add_balance = $5, watching_change_minuser = $6, watching_change_balance = $7, watching_message_user = $8, choose_tele_id = $9 WHERE tele_id = $10", 0, 0, 0, 0, 0, 0, 0, 0, 0, teleId)
 	if err != nil {
 		return err
 	}

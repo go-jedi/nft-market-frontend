@@ -413,11 +413,11 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 			return err
 		}
 	case "NM_WORKPANEL_MAM_PREM":
-		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		i, err := strconv.ParseInt(needParams[1], 10, 64)
 		if err != nil {
 			return err
 		}
-		i, err := strconv.ParseInt(needParams[1], 10, 64)
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, i)
 		if err != nil {
 			return err
 		}
@@ -426,11 +426,11 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 			return err
 		}
 	case "NM_WORKPANEL_MAM_VERIF":
-		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		i, err := strconv.ParseInt(needParams[1], 10, 64)
 		if err != nil {
 			return err
 		}
-		i, err := strconv.ParseInt(needParams[1], 10, 64)
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, i)
 		if err != nil {
 			return err
 		}
@@ -439,11 +439,11 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 			return err
 		}
 	case "NM_WORKPANEL_ADB":
-		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		i, err := strconv.ParseInt(needParams[1], 10, 64)
 		if err != nil {
 			return err
 		}
-		i, err := strconv.ParseInt(needParams[1], 10, 64)
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, i)
 		if err != nil {
 			return err
 		}
@@ -478,11 +478,11 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 			return err
 		}
 	case "NM_WORKPANEL_MSM":
-		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		i, err := strconv.ParseInt(needParams[1], 10, 64)
 		if err != nil {
 			return err
 		}
-		i, err := strconv.ParseInt(needParams[1], 10, 64)
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, i)
 		if err != nil {
 			return err
 		}
@@ -666,10 +666,14 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 			}
 			if resAdminAddBalance {
 				msg.ChatID = teleIdUser
-				if resGetUserLang == "ru" {
+				resGetUserLangTwo, err := sqlite.GetUserLang(b.SqliteDb, teleIdUser)
+				if err != nil {
+					return err
+				}
+				if resGetUserLangTwo == "ru" {
 					msg.Text = fmt.Sprintf("На ваш аккаунт добавлено: *%.2f$*", i)
 				}
-				if resGetUserLang == "en" {
+				if resGetUserLangTwo == "en" {
 					msg.Text = fmt.Sprintf("Added to your account: *%.2f$*", i)
 				}
 				_, err = b.Bot.Send(msg)
