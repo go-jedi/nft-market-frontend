@@ -52,7 +52,6 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 	switch message.Command() {
 	case CommandStart:
 		if len(needParams) > 1 {
-			fmt.Println("1")
 			i, err := strconv.ParseInt(needParams[1], 10, 64)
 			if err != nil {
 				return err
@@ -62,14 +61,11 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 				return err
 			}
 		}
-		fmt.Println("2")
 		resCheckIsAdmin, err := requestProject.CheckIsAdmin(message.From.ID)
 		if err != nil {
 			return err
 		}
-		fmt.Println("3")
 		if resCheckIsAdmin {
-			fmt.Println("4")
 			err = sqlite.TurnOffListeners(b.SqliteDb, message.From.ID)
 			if err != nil {
 				return err
@@ -80,9 +76,7 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 				return err
 			}
 		} else {
-			fmt.Println("5")
 			if len(needParams) > 1 {
-				fmt.Println("6")
 				i, err := strconv.ParseInt(needParams[1], 10, 64)
 				if err != nil {
 					return err
@@ -91,7 +85,6 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 				if err != nil {
 					return err
 				}
-				fmt.Println("resCheckIsAdmin -->", resCheckIsAdmin)
 				if resCheckIsAdmin {
 					msg.ParseMode = "Markdown"
 					err := start.GetStart(b.Bot, msg, message.From.ID, message.From.UserName, i)
@@ -100,7 +93,6 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 					}
 				}
 			} else {
-				fmt.Println("7")
 				resCheckAuth, err := requestProject.CheckAuth(message.From.ID)
 				if err != nil {
 					return err

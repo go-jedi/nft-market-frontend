@@ -1,8 +1,6 @@
 package start
 
 import (
-	"fmt"
-
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/keyboard"
 	requestProject "github.com/rob-bender/nft-market-frontend/pkg/telegram/request"
@@ -117,7 +115,6 @@ func GetStart(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, us
 		if err != nil {
 			return err
 		}
-		fmt.Println("resRegisterUser -->", resRegisterUser)
 		if resRegisterUser {
 			var text string = "🏳️?"
 			msg.ReplyMarkup = keyboard.DgLangKeyboardInline
