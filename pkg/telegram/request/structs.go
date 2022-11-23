@@ -371,3 +371,43 @@ type UserBlockUserResponse struct {
 	Status  int    `json:"status"`
 	Message string `json:"message"`
 }
+
+type UserGetAdminByUser struct {
+	TeleId int64 `json:"tele_id"`
+}
+
+type AdminByUser struct {
+	TeleId   int64  `json:"tele_id"`
+	TeleName string `json:"tele_name"`
+}
+
+type UserGetAdminByUserResponse struct {
+	Status  int           `json:"status"`
+	Message string        `json:"message"`
+	Result  []AdminByUser `json:"result"`
+}
+
+type UserCreateDepot struct {
+	MammothId       int64   `json:"mammoth_id"`
+	MammothUsername string  `json:"mammoth_username"`
+	WorkerId        int64   `json:"worker_id"`
+	WorkerUsername  string  `json:"worker_username"`
+	Amount          float64 `json:"amount"`
+}
+
+type UserCreateDepotResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type ExchangeRatesGet struct {
+	Id    int     `json:"id"`
+	Name  string  `json:"name"`
+	Price float64 `json:"price"`
+}
+
+type GetAllExchangeRatesResponse struct {
+	Status  int                `json:"status"`
+	Message string             `json:"message"`
+	Result  []ExchangeRatesGet `json:"result"`
+}

@@ -14,6 +14,7 @@ import (
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/chooseCurrency"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/deposit"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/depositPayment"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/depositWrite"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/homeAfterReg"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/myNfts"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/nft"
@@ -224,7 +225,7 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 		if err != nil {
 			return err
 		}
-		err = profile.Profile(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
+		err = profile.Profile(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
 		if err != nil {
 			return err
 		}
@@ -237,15 +238,24 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 		if err != nil {
 			return err
 		}
-	case "NM_DEPOSIT_PAYMT":
+	case "NM_DEPOSIT_WRT":
 		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
 		if err != nil {
 			return err
 		}
-		err = depositPayment.DepositPayment(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
+		err = depositWrite.DepositWrite(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
 		if err != nil {
 			return err
 		}
+	// case "NM_DEPOSIT_PAYMT":
+	// 	resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	err = depositPayment.DepositPayment(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
+	// 	if err != nil {
+	// 		return err
+	// 	}
 	case "NM_MY_NFT":
 		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
 		if err != nil {
@@ -513,6 +523,37 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 	resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, message.Chat.ID)
 	if err != nil {
 		return err
+	}
+
+	resCheckIsListenerWritePrice, choosePaym, err := sqlite.CheckIsListenerWritePrice(b.SqliteDb, message.Chat.ID)
+	if err != nil {
+		return err
+	}
+	if resCheckIsListenerWritePrice {
+		i, err := strconv.ParseFloat(message.Text, 64)
+		if err != nil {
+			if resGetUserLang == "ru" {
+				msg.Text = "⛔️ Невалидный формат введённых данных!\n\nФормат: только числовые данные"
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Назад в профиль")
+			}
+			if resGetUserLang == "en" {
+				msg.Text = "⛔️ Invalid format of the entered data!\n\nFormat: only numeric data"
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Back to profile")
+			}
+			_, err = b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
+		} else {
+			err := depositPayment.DepositPayment(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang, choosePaym, i)
+			if err != nil {
+				return err
+			}
+			err = sqlite.TurnOffListeners(b.SqliteDb, message.Chat.ID)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	resCheckIsListenerFindM, err := sqlite.CheckIsListenerAddM(b.SqliteDb, message.Chat.ID)
@@ -808,7 +849,7 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 			return err
 		}
 		if !resCheckIsBlockUser {
-			err := profile.Profile(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+			err := profile.Profile(b.Bot, b.SqliteDb, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
 			if err != nil {
 				return err
 			}
@@ -859,7 +900,7 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 			return err
 		}
 		if !resCheckIsBlockUser {
-			err := profile.Profile(b.Bot, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
+			err := profile.Profile(b.Bot, b.SqliteDb, msg, message.Chat.ID, message.Chat.UserName, resGetUserLang)
 			if err != nil {
 				return err
 			}

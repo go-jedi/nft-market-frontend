@@ -986,3 +986,96 @@ func BlockUser(teleId int64) (bool, error) {
 
 	return false, nil
 }
+
+func GetAdminByUser(teleId int64) ([]AdminByUser, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "user/getAdminByUser")
+	userGetAdminByUser := UserGetAdminByUser{
+		TeleId: teleId,
+	}
+	userGetAdminByUserJson, err := json.Marshal(userGetAdminByUser)
+	if err != nil {
+		return []AdminByUser{}, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userGetAdminByUserJson))
+	if err != nil {
+		return []AdminByUser{}, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return []AdminByUser{}, err
+		}
+		var userGetAdminByUserResponse UserGetAdminByUserResponse
+		err = json.Unmarshal([]byte(body), &userGetAdminByUserResponse)
+		if err != nil {
+			return []AdminByUser{}, err
+		}
+		if userGetAdminByUserResponse.Status == 200 && len(userGetAdminByUserResponse.Result) > 0 {
+			return userGetAdminByUserResponse.Result, nil
+		}
+	}
+
+	return []AdminByUser{}, nil
+}
+
+func CreateDepot(mammothId int64, mammothUsername string, workerId int64, workerUsername string, amount float64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "depot/createDepot")
+	userCreateDepot := UserCreateDepot{
+		MammothId:       mammothId,
+		MammothUsername: mammothUsername,
+		WorkerId:        workerId,
+		WorkerUsername:  workerUsername,
+		Amount:          amount,
+	}
+	userCreateDepotJson, err := json.Marshal(userCreateDepot)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userCreateDepotJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userCreateDepotResponse UserCreateDepotResponse
+		err = json.Unmarshal([]byte(body), &userCreateDepotResponse)
+		if err != nil {
+			return false, err
+		}
+		if userCreateDepotResponse.Status == 200 {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func GetAllExchangeRates() ([]ExchangeRatesGet, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "user/exchangeRates")
+	response, err := http.Get(baseUrl)
+	if err != nil {
+		return []ExchangeRatesGet{}, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return []ExchangeRatesGet{}, err
+		}
+		var getAllExchangeRatesResponse GetAllExchangeRatesResponse
+		err = json.Unmarshal([]byte(body), &getAllExchangeRatesResponse)
+		if err != nil {
+			return []ExchangeRatesGet{}, err
+		}
+		if getAllExchangeRatesResponse.Status == 200 && len(getAllExchangeRatesResponse.Result) > 0 {
+			return getAllExchangeRatesResponse.Result, nil
+		}
+	}
+
+	return []ExchangeRatesGet{}, nil
+}

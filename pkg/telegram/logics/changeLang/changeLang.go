@@ -25,7 +25,7 @@ func ChangeLang(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.MessageConf
 			if err != nil {
 				return err
 			}
-			err = profile.Profile(bot, msg, teleId, userName, needLangUserChange)
+			err = profile.Profile(bot, sqliteDb, msg, teleId, userName, needLangUserChange)
 			if err != nil {
 				return err
 			}
