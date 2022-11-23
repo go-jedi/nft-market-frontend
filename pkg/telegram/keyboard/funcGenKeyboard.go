@@ -98,13 +98,13 @@ func GenKeyboardInlineForProfileMenuAdmin(textTopUp string, textWithdraw string,
 func GenKeyboardInlineForDeposit(textBackProfile string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("🔸 Bitcoin", "NM_DEPOSIT_PAYMT?btc"),
+			tgbotapi.NewInlineKeyboardButtonData("🔸 Bitcoin", "NM_DEPOSIT_WRT?btc"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("🔹 Ethereum", "NM_DEPOSIT_PAYMT?eth"),
+			tgbotapi.NewInlineKeyboardButtonData("🔹 Ethereum", "NM_DEPOSIT_WRT?eth"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("💱 USDT", "NM_DEPOSIT_PAYMT?usdt"),
+			tgbotapi.NewInlineKeyboardButtonData("💱 USDT", "NM_DEPOSIT_WRT?usdt"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(textBackProfile, "NM_PROFILE"),
@@ -290,6 +290,14 @@ func GenKeyboardInlineForAddBalance(teleId int64) tgbotapi.InlineKeyboardMarkup 
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("🔙 Назад в профиль", fmt.Sprintf("NM_WORKPANEL_MAM_US?%d", teleId)),
+		),
+	)
+}
+
+func GenKeyboardInlineForDepositWrite(textBackProfile string) tgbotapi.InlineKeyboardMarkup {
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(textBackProfile, "NM_PROFILE"),
 		),
 	)
 }

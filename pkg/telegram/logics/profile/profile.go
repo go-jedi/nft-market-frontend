@@ -1,20 +1,26 @@
 package profile
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/keyboard"
 	requestProject "github.com/rob-bender/nft-market-frontend/pkg/telegram/request"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/sqlite"
 )
 
-func Profile(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, userName string, languageUser string) error {
+func Profile(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.MessageConfig, teleId int64, userName string, languageUser string) error {
 	resGetUserProfile, err := requestProject.GetUserProfile(teleId)
 	if err != nil {
 		return err
 	}
 	if len(resGetUserProfile) > 0 {
+		err = sqlite.TurnOffListeners(sqliteDb, teleId)
+		if err != nil {
+			return err
+		}
 		var isTesting string = os.Getenv("IS_TESTING")
 		var needPath string = ""
 		if isTesting == "true" {
