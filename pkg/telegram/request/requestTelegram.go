@@ -8,7 +8,7 @@ import (
 )
 
 func SendTelegramNewDepot() error {
-	var chatId int = 5465604654
+	var chatId int = 804476881
 	var text string = "🤑 Пришел новый деп!"
 	var telegramApi string = "https://api.telegram.org/bot" + os.Getenv("TELEGRAM_BOT_SEND") + "/sendMessage"
 	response, err := http.PostForm(
