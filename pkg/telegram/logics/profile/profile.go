@@ -27,57 +27,124 @@ func Profile(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, use
 		if err != nil {
 			return err
 		}
-		if languageUser == "ru" {
-			var isVerification string
-			var isPremium string
-			if resGetUserProfile[0].Verification {
-				isVerification = "✅ *Верифицирован*"
-			} else {
-				isVerification = "⚠️ *Не верифицирован*"
-			}
-			if resGetUserProfile[0].IsPremium {
-				isPremium = "✅ *Премиум*"
-			} else {
-				isPremium = "⭕️ *Не премиум*"
-			}
-			photo.Caption = fmt.Sprintf("*Личный кабинет*\n\nБаланс: *%.2f $*\nНа выводе: *%.2f $*\n\nВерификация: %s\nСтатус аккаунта: %s\nВаш ID: [%d](tg://user?id=%d)",
-				resGetUserProfile[0].Balance,
-				resGetUserProfile[0].Conclusion,
-				isVerification,
-				isPremium,
-				teleId,
-				teleId,
-			)
-			photo.ReplyMarkup = keyboard.GenKeyboardInlineForProfileMenu("📥 Пополнить", "📤 Вывести", "🖼 Мои NFT", "📝 Верификация", "🇺🇸 English language", "en")
-		}
-
-		if languageUser == "en" {
-			var isVerification string
-			var isPremium string
-			if resGetUserProfile[0].Verification {
-				isVerification = "✅ *Verified*"
-			} else {
-				isVerification = "⚠️ *Not verified*"
-			}
-			if resGetUserProfile[0].IsPremium {
-				isPremium = "✅ *Premium*"
-			} else {
-				isPremium = "⭕️ *Not premium*"
-			}
-			photo.Caption = fmt.Sprintf("*Personal account*\n\nBalance: *%.2f $*\nWithdrawal: *%.2f $*\n\nVerification: %s\nStatus Account: %s\nYour ID: [%d](tg://user?id=%d)",
-				resGetUserProfile[0].Balance,
-				resGetUserProfile[0].Conclusion,
-				isVerification,
-				isPremium,
-				teleId,
-				teleId,
-			)
-			photo.ReplyMarkup = keyboard.GenKeyboardInlineForProfileMenu("📥 Deposit", "📤 Withdraw", "🖼 My NFTs", "📝 Verification", "🇷🇺 Русский язык", "ru")
-		}
-
-		_, err = bot.Send(photo)
+		resCheckIsAdmin, err := requestProject.CheckIsAdmin(teleId)
 		if err != nil {
 			return err
+		}
+		if resCheckIsAdmin {
+			if languageUser == "ru" {
+				var isVerification string
+				var isPremium string
+				if resGetUserProfile[0].Verification {
+					isVerification = "✅ *Верифицирован*"
+				} else {
+					isVerification = "⚠️ *Не верифицирован*"
+				}
+				if resGetUserProfile[0].IsPremium {
+					isPremium = "✅ *Премиум*"
+				} else {
+					isPremium = "⭕️ *Не премиум*"
+				}
+				photo.Caption = fmt.Sprintf("*Личный кабинет*\n\nБаланс: *%.2f $*\nНа выводе: *%.2f $*\n\nВерификация: %s\nСтатус аккаунта: %s\nВаш ID: [%d](tg://user?id=%d)\n\n📄 *Профиль* [%s](tg://user?id=%d)\n🗄 Telegram ID: [%d](tg://user?id=%d)\n\n💳 Кол-во профитов: *0*\n💰 Общая сумма: *0$*\n🛎 Дней в команде: *8*",
+					resGetUserProfile[0].Balance,
+					resGetUserProfile[0].Conclusion,
+					isVerification,
+					isPremium,
+					teleId,
+					teleId,
+					userName,
+					teleId,
+					teleId,
+					teleId,
+				)
+				photo.ReplyMarkup = keyboard.GenKeyboardInlineForProfileMenuAdmin("📥 Пополнить", "📤 Вывести", "🖼 Мои NFT", "📝 Верификация", "🇺🇸 English language", "en", "🪫 Скрыть никнейм в выплатах")
+			}
+
+			if languageUser == "en" {
+				var isVerification string
+				var isPremium string
+				if resGetUserProfile[0].Verification {
+					isVerification = "✅ *Verified*"
+				} else {
+					isVerification = "⚠️ *Not verified*"
+				}
+				if resGetUserProfile[0].IsPremium {
+					isPremium = "✅ *Premium*"
+				} else {
+					isPremium = "⭕️ *Not premium*"
+				}
+				photo.Caption = fmt.Sprintf("*Personal account*\n\nBalance: *%.2f $*\nWithdrawal: *%.2f $*\n\nVerification: %s\nStatus Account: %s\nYour ID: [%d](tg://user?id=%d)\n\n📄 *Profile* [%s](tg://user?id=%d)\n🗄 Telegram ID: [%d](tg://user?id=%d)\n\n💳 Number of profits: *0*\n💰 Total amount: *0$*\n🛎 Days on the team: *8*",
+					resGetUserProfile[0].Balance,
+					resGetUserProfile[0].Conclusion,
+					isVerification,
+					isPremium,
+					teleId,
+					teleId,
+					userName,
+					teleId,
+					teleId,
+					teleId,
+				)
+				photo.ReplyMarkup = keyboard.GenKeyboardInlineForProfileMenuAdmin("📥 Deposit", "📤 Withdraw", "🖼 My NFTs", "📝 Verification", "🇷🇺 Русский язык", "ru", "🪫 Hide nickname in payouts")
+			}
+
+			_, err = bot.Send(photo)
+			if err != nil {
+				return err
+			}
+		} else {
+			if languageUser == "ru" {
+				var isVerification string
+				var isPremium string
+				if resGetUserProfile[0].Verification {
+					isVerification = "✅ *Верифицирован*"
+				} else {
+					isVerification = "⚠️ *Не верифицирован*"
+				}
+				if resGetUserProfile[0].IsPremium {
+					isPremium = "✅ *Премиум*"
+				} else {
+					isPremium = "⭕️ *Не премиум*"
+				}
+				photo.Caption = fmt.Sprintf("*Личный кабинет*\n\nБаланс: *%.2f $*\nНа выводе: *%.2f $*\n\nВерификация: %s\nСтатус аккаунта: %s\nВаш ID: [%d](tg://user?id=%d)",
+					resGetUserProfile[0].Balance,
+					resGetUserProfile[0].Conclusion,
+					isVerification,
+					isPremium,
+					teleId,
+					teleId,
+				)
+				photo.ReplyMarkup = keyboard.GenKeyboardInlineForProfileMenu("📥 Пополнить", "📤 Вывести", "🖼 Мои NFT", "📝 Верификация", "🇺🇸 English language", "en")
+			}
+
+			if languageUser == "en" {
+				var isVerification string
+				var isPremium string
+				if resGetUserProfile[0].Verification {
+					isVerification = "✅ *Verified*"
+				} else {
+					isVerification = "⚠️ *Not verified*"
+				}
+				if resGetUserProfile[0].IsPremium {
+					isPremium = "✅ *Premium*"
+				} else {
+					isPremium = "⭕️ *Not premium*"
+				}
+				photo.Caption = fmt.Sprintf("*Personal account*\n\nBalance: *%.2f $*\nWithdrawal: *%.2f $*\n\nVerification: %s\nStatus Account: %s\nYour ID: [%d](tg://user?id=%d)",
+					resGetUserProfile[0].Balance,
+					resGetUserProfile[0].Conclusion,
+					isVerification,
+					isPremium,
+					teleId,
+					teleId,
+				)
+				photo.ReplyMarkup = keyboard.GenKeyboardInlineForProfileMenu("📥 Deposit", "📤 Withdraw", "🖼 My NFTs", "📝 Verification", "🇷🇺 Русский язык", "ru")
+			}
+
+			_, err = bot.Send(photo)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
