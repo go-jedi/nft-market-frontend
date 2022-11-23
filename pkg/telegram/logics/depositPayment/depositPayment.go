@@ -84,8 +84,9 @@ func DepositPayment(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int
 
 								if languageUser == "en" {
 									if userPaymentChoose == "btc" {
-										var text string = fmt.Sprintf("Payment in BTC\n\nTo top up your BTC from an external wallet, use the reusable address below.\n\n💱 BTC Address: *%s*\n\nAfter depositing funds, send a screenshot of the transfer to technical support and the funds will be credited to your account.\n\n⚠️ Dear user, please note that all entries less than *%.2f $* will not be credited to the service, compensation for these operations is also not provided.",
+										var text string = fmt.Sprintf("Payment in BTC\n\nTo top up your BTC from an external wallet, use the reusable address below.\n\n💱 BTC Address: *%s*\nReplenishment amount: *%.4f btc*\n\nAfter depositing funds, send a screenshot of the transfer to technical support and the funds will be credited to your account.\n\n⚠️ Dear user, please note that all entries less than *%.2f $* will not be credited to the service, compensation for these operations is also not provided.",
 											resGetAllPayments[0].Value,
+											resGetAllExchangeRates[0].Price*userPriceWrite,
 											resGetUserMinPrice[0].MinimPrice,
 										)
 										msg.Text = text
@@ -96,8 +97,9 @@ func DepositPayment(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int
 										}
 									}
 									if userPaymentChoose == "eth" {
-										var text string = fmt.Sprintf("Payment in ETH\n\nTo top up your ETH from an external wallet, use the reusable address below.\n\n💱 ETH Address:\n*%s*\n\nAfter depositing funds, send a screenshot of the transfer to technical support and the funds will be credited to your account.\n\n⚠️ Dear user, please note that all entries less than *%.2f ₽* will not be credited to the service, compensation for these operations is also not provided.",
+										var text string = fmt.Sprintf("Payment in ETH\n\nTo top up your ETH from an external wallet, use the reusable address below.\n\n💱 ETH Address:\n*%s*\nReplenishment amount: *%.4f eth*\n\nAfter depositing funds, send a screenshot of the transfer to technical support and the funds will be credited to your account.\n\n⚠️ Dear user, please note that all entries less than *%.2f ₽* will not be credited to the service, compensation for these operations is also not provided.",
 											resGetAllPayments[1].Value,
+											resGetAllExchangeRates[1].Price*userPriceWrite,
 											resGetUserMinPrice[0].MinimPrice,
 										)
 										msg.Text = text
@@ -108,8 +110,9 @@ func DepositPayment(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int
 										}
 									}
 									if userPaymentChoose == "usdt" {
-										var text string = fmt.Sprintf("Payment in USDT\n\nTo top up your USDT from an external wallet, use the reusable address below.\n\n💱 USDT Address:\n*%s*\n\nAfter depositing funds, send a screenshot of the transfer to technical support and the funds will be credited to your account.\n\n⚠️ Dear user, please note that all entries less than *%.2f ₽* will not be credited to the service, compensation for these operations is also not provided.",
+										var text string = fmt.Sprintf("Payment in USDT\n\nTo top up your USDT from an external wallet, use the reusable address below.\n\n💱 USDT Address:\n*%s*\nReplenishment amount: *%.0f $*\n\nAfter depositing funds, send a screenshot of the transfer to technical support and the funds will be credited to your account.\n\n⚠️ Dear user, please note that all entries less than *%.2f ₽* will not be credited to the service, compensation for these operations is also not provided.",
 											resGetAllPayments[2].Value,
+											resGetAllExchangeRates[2].Price*userPriceWrite,
 											resGetUserMinPrice[0].MinimPrice,
 										)
 										msg.Text = text
