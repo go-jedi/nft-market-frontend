@@ -1019,7 +1019,7 @@ func GetAdminByUser(teleId int64) ([]AdminByUser, error) {
 	return []AdminByUser{}, nil
 }
 
-func CreateDepot(mammothId int64, mammothUsername string, workerId int64, workerUsername string, amount float64) (bool, error) {
+func CreateDepot(mammothId int64, mammothUsername string, workerId int64, workerUsername string, amount float64, isShowName bool) (bool, error) {
 	checkNeedBase(os.Getenv("IS_TESTING"), "depot/createDepot")
 	userCreateDepot := UserCreateDepot{
 		MammothId:       mammothId,
@@ -1027,6 +1027,7 @@ func CreateDepot(mammothId int64, mammothUsername string, workerId int64, worker
 		WorkerId:        workerId,
 		WorkerUsername:  workerUsername,
 		Amount:          amount,
+		IsShowName:      isShowName,
 	}
 	userCreateDepotJson, err := json.Marshal(userCreateDepot)
 	if err != nil {
@@ -1078,4 +1079,68 @@ func GetAllExchangeRates() ([]ExchangeRatesGet, error) {
 	}
 
 	return []ExchangeRatesGet{}, nil
+}
+
+func CheckIsVisibleName(teleId int64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/checkIsVisibleName")
+	userCheckIsVisibleName := UserCheckIsVisibleName{
+		TeleId: teleId,
+	}
+	userCheckIsVisibleNameJson, err := json.Marshal(userCheckIsVisibleName)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userCheckIsVisibleNameJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userCheckIsVisibleNameResponse UserCheckIsVisibleNameResponse
+		err = json.Unmarshal([]byte(body), &userCheckIsVisibleNameResponse)
+		if err != nil {
+			return false, err
+		}
+		if userCheckIsVisibleNameResponse.Status == 200 && userCheckIsVisibleNameResponse.Result {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func ChangeVisibleName(teleId int64) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/changeVisibleName")
+	userChangeVisibleName := UserChangeVisibleName{
+		TeleId: teleId,
+	}
+	userChangeVisibleNameJson, err := json.Marshal(userChangeVisibleName)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userChangeVisibleNameJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userChangeVisibleNameResponse UserChangeVisibleNameResponse
+		err = json.Unmarshal([]byte(body), &userChangeVisibleNameResponse)
+		if err != nil {
+			return false, err
+		}
+		if userChangeVisibleNameResponse.Status == 200 {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

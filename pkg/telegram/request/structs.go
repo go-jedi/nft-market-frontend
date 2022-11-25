@@ -393,6 +393,7 @@ type UserCreateDepot struct {
 	WorkerId        int64   `json:"worker_id"`
 	WorkerUsername  string  `json:"worker_username"`
 	Amount          float64 `json:"amount"`
+	IsShowName      bool    `json:"is_show_name"`
 }
 
 type UserCreateDepotResponse struct {
@@ -410,4 +411,23 @@ type GetAllExchangeRatesResponse struct {
 	Status  int                `json:"status"`
 	Message string             `json:"message"`
 	Result  []ExchangeRatesGet `json:"result"`
+}
+
+type UserCheckIsVisibleName struct {
+	TeleId int64 `json:"tele_id"`
+}
+
+type UserCheckIsVisibleNameResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Result  bool   `json:"result"`
+}
+
+type UserChangeVisibleName struct {
+	TeleId int64 `json:"tele_id"`
+}
+
+type UserChangeVisibleNameResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
 }

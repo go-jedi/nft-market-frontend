@@ -21,6 +21,7 @@ import (
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/nftCollection"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/nftToken"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/nftTokenBuy"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/nickPayouts"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/profile"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/start"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/support"
@@ -510,6 +511,15 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 			return err
 		}
 		err = blockUser.BlockUser(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, i)
+		if err != nil {
+			return err
+		}
+	case "NM_HIDE_NCK":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = nickPayouts.NickPayouts(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
 		if err != nil {
 			return err
 		}

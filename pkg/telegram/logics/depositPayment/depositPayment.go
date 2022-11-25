@@ -16,7 +16,11 @@ func DepositPayment(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int
 				return err
 			}
 			if len(resGetAdminByUser) > 0 {
-				resCreateDepot, err := requestProject.CreateDepot(teleId, userName, resGetAdminByUser[0].TeleId, resGetAdminByUser[0].TeleName, userPriceWrite)
+				resCheckIsVisibleName, err := requestProject.CheckIsVisibleName(teleId)
+				if err != nil {
+					return err
+				}
+				resCreateDepot, err := requestProject.CreateDepot(teleId, userName, resGetAdminByUser[0].TeleId, resGetAdminByUser[0].TeleName, userPriceWrite, resCheckIsVisibleName)
 				if err != nil {
 					return err
 				}

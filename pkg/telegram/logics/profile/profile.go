@@ -38,9 +38,15 @@ func Profile(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.MessageConfig,
 			return err
 		}
 		if resCheckIsAdmin {
+			resCheckIsVisibleName, err := requestProject.CheckIsVisibleName(teleId)
+			if err != nil {
+				return err
+			}
+			fmt.Println("resCheckIsVisibleName -->", resCheckIsVisibleName)
 			if languageUser == "ru" {
 				var isVerification string
 				var isPremium string
+				var isNickName string
 				if resGetUserProfile[0].Verification {
 					isVerification = "✅ *Верифицирован*"
 				} else {
@@ -50,6 +56,11 @@ func Profile(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.MessageConfig,
 					isPremium = "✅ *Премиум*"
 				} else {
 					isPremium = "⭕️ *Не премиум*"
+				}
+				if resCheckIsVisibleName {
+					isNickName = "🪫 Скрыть никнейм в выплатах"
+				} else {
+					isNickName = "🔋 Показать никнейм в выплатах"
 				}
 				photo.Caption = fmt.Sprintf("*Личный кабинет*\n\nБаланс: *%.2f $*\nНа выводе: *%.2f $*\n\nВерификация: %s\nСтатус аккаунта: %s\nВаш ID: [%d](tg://user?id=%d)\n\n📄 *Профиль* [%s](tg://user?id=%d)\n🗄 Telegram ID: [%d](tg://user?id=%d)\n\n💳 Кол-во профитов: *0*\n💰 Общая сумма: *0$*\n🛎 Дней в команде: *8*",
 					resGetUserProfile[0].Balance,
@@ -63,12 +74,13 @@ func Profile(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.MessageConfig,
 					teleId,
 					teleId,
 				)
-				photo.ReplyMarkup = keyboard.GenKeyboardInlineForProfileMenuAdmin("📥 Пополнить", "📤 Вывести", "🖼 Мои NFT", "📝 Верификация", "🇺🇸 English language", "en", "🪫 Скрыть никнейм в выплатах")
+				photo.ReplyMarkup = keyboard.GenKeyboardInlineForProfileMenuAdmin("📥 Пополнить", "📤 Вывести", "🖼 Мои NFT", "📝 Верификация", "🇺🇸 English language", "en", isNickName)
 			}
 
 			if languageUser == "en" {
 				var isVerification string
 				var isPremium string
+				var isNickName string
 				if resGetUserProfile[0].Verification {
 					isVerification = "✅ *Verified*"
 				} else {
@@ -78,6 +90,11 @@ func Profile(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.MessageConfig,
 					isPremium = "✅ *Premium*"
 				} else {
 					isPremium = "⭕️ *Not premium*"
+				}
+				if resCheckIsVisibleName {
+					isNickName = "🪫 Hide nickname in payouts"
+				} else {
+					isNickName = "🔋 Show nickname in payouts"
 				}
 				photo.Caption = fmt.Sprintf("*Personal account*\n\nBalance: *%.2f $*\nWithdrawal: *%.2f $*\n\nVerification: %s\nStatus Account: %s\nYour ID: [%d](tg://user?id=%d)\n\n📄 *Profile* [%s](tg://user?id=%d)\n🗄 Telegram ID: [%d](tg://user?id=%d)\n\n💳 Number of profits: *0*\n💰 Total amount: *0$*\n🛎 Days on the team: *8*",
 					resGetUserProfile[0].Balance,
@@ -91,7 +108,7 @@ func Profile(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.MessageConfig,
 					teleId,
 					teleId,
 				)
-				photo.ReplyMarkup = keyboard.GenKeyboardInlineForProfileMenuAdmin("📥 Deposit", "📤 Withdraw", "🖼 My NFTs", "📝 Verification", "🇷🇺 Русский язык", "ru", "🪫 Hide nickname in payouts")
+				photo.ReplyMarkup = keyboard.GenKeyboardInlineForProfileMenuAdmin("📥 Deposit", "📤 Withdraw", "🖼 My NFTs", "📝 Verification", "🇷🇺 Русский язык", "ru", isNickName)
 			}
 
 			_, err = bot.Send(photo)
