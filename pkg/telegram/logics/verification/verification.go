@@ -17,7 +17,7 @@ func Verification(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64
 		} else {
 			needPath = "/home/nft-market-bot/frontend/nft-market-frontend/img"
 		}
-		photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath(fmt.Sprintf("%s%s", needPath, "/img-need/3.jpg")))
+		photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath(fmt.Sprintf("%s%s", needPath, "/img-need/4.jpg")))
 		photo.ParseMode = "Markdown"
 		if languageUser == "ru" {
 			photo.Caption = "*Ваш аккаунт не верифицирован*\n\nДля получения инструкций по прохождению верификации напишите «Верификация» в чат технической поддержки."

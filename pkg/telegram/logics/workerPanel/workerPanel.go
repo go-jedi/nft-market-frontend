@@ -17,9 +17,9 @@ func WorkerPanel(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.MessageCon
 			return err
 		}
 		var linkBot string = os.Getenv("LINK_BOT")
-		msg.ParseMode = "HTML"
+		msg.ParseMode = "Markdown"
 		msg.ReplyMarkup = keyboard.GenKeyboardInlineForWorkerPanel()
-		msg.Text = fmt.Sprintf("🔗 Ваша ссылка:\n<a href='%s?start=%d'>%s?start=%d</a>", linkBot, teleId, linkBot, teleId)
+		msg.Text = fmt.Sprintf("🔗 Твоя ссылка: `%s?start=%d`", linkBot, teleId)
 		_, err = bot.Send(msg)
 		if err != nil {
 			return err
