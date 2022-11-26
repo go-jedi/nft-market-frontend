@@ -28,7 +28,7 @@ func Profile(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.MessageConfig,
 		} else {
 			needPath = "/home/nft-market-bot/frontend/nft-market-frontend/img"
 		}
-		photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath(fmt.Sprintf("%s%s", needPath, "/img-need/4.jpg")))
+		photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath(fmt.Sprintf("%s%s", needPath, "/img-need/1.jpg")))
 		photo.ParseMode = "Markdown"
 		if err != nil {
 			return err

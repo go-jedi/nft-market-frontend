@@ -23,7 +23,7 @@ func Nft(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64, userNam
 			} else {
 				needPath = "/home/nft-market-bot/frontend/nft-market-frontend/img"
 			}
-			photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath(fmt.Sprintf("%s%s", needPath, "/img-need/1.jpg")))
+			photo := tgbotapi.NewPhoto(teleId, tgbotapi.FilePath(fmt.Sprintf("%s%s", needPath, "/img-need/5.jpg")))
 			photo.ParseMode = "Markdown"
 			if languageUser == "ru" {
 				var nameCollection string = ""
