@@ -17,6 +17,9 @@ import (
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/depositWrite"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/homeAfterReg"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/myNfts"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/myNftsAdminBuy"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/myNftsToken"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/myNftsTokenSell"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/nft"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/nftCollection"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/nftToken"
@@ -27,7 +30,10 @@ import (
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/support"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/verification"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/withDraw"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/withDrawAdmApprove"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/withDrawAdmRefuse"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/withDrawPayment"
+	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/withDrawWrite"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/addBalance"
 	"github.com/rob-bender/nft-market-frontend/pkg/telegram/logics/workerPanel/addMamMinim"
@@ -248,23 +254,47 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 		if err != nil {
 			return err
 		}
-	// case "NM_DEPOSIT_PAYMT":
-	// 	resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	err = depositPayment.DepositPayment(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
-	// 	if err != nil {
-	// 		return err
-	// 	}
 	case "NM_MY_NFT":
 		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
 		if err != nil {
 			return err
 		}
-		err = myNfts.MyNfts(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
+		err = myNfts.MyNfts(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
 		if err != nil {
 			return err
+		}
+	case "NM_MY_NFT_N":
+		var params = strings.Split(needParams[1], ",")
+		if len(params) == 2 {
+			resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+			if err != nil {
+				return err
+			}
+			err = myNftsToken.MyNftsToken(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, params[0], params[1])
+			if err != nil {
+				return err
+			}
+		}
+	case "NM_MY_NFT_NSL":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = myNftsTokenSell.MyNftsTokenSell(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
+		if err != nil {
+			return err
+		}
+	case "NM_ADS":
+		var params = strings.Split(needParams[1], ",")
+		if len(params) == 2 {
+			resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+			if err != nil {
+				return err
+			}
+			err = myNftsAdminBuy.MyNftsAdminBuy(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, params[0], params[1])
+			if err != nil {
+				return err
+			}
 		}
 	case "NM_VERIF":
 		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
@@ -313,6 +343,33 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 			return err
 		}
 		err = withDraw.WithDraw(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
+		if err != nil {
+			return err
+		}
+	case "NM_WITH_DRAW_WR":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = withDrawWrite.WithDrawWrite(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang)
+		if err != nil {
+			return err
+		}
+	case "NM_WITH_DRAW_AA":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = withDrawAdmApprove.WithDrawAdmApprove(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
+		if err != nil {
+			return err
+		}
+	case "NM_WITH_DRAW_AR":
+		resGetUserLang, err := sqlite.GetUserLang(b.SqliteDb, callbackQuery.Message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		err = withDrawAdmRefuse.WithDrawAdmRefuse(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
 		if err != nil {
 			return err
 		}
@@ -832,6 +889,181 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 		_, err = b.Bot.Send(msg)
 		if err != nil {
 			return err
+		}
+	}
+
+	resCheckIsListenerWatchingNftSell, tokenUid, err := sqlite.CheckIsListenerWatchingNftSell(b.SqliteDb, message.Chat.ID)
+	if err != nil {
+		return err
+	}
+	if resCheckIsListenerWatchingNftSell {
+		resGetUserLangTwo, err := sqlite.GetUserLang(b.SqliteDb, message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		i, err := strconv.ParseFloat(message.Text, 64)
+		if err != nil {
+			if resGetUserLangTwo == "ru" {
+				msg.Text = "⛔️ Невалидный формат введённых данных!\n\nФормат: только числовые данные"
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForTokenSell("🔙 Назад")
+			}
+			if resGetUserLangTwo == "en" {
+				msg.Text = "⛔️ Invalid format of the entered data!\n\nFormat: only numeric data"
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForTokenSell("🔙 Back")
+			}
+			_, err = b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
+		} else {
+			uidPaymentEvent, resSellUserToken, err := requestProject.SellUserToken(message.Chat.ID, tokenUid, i)
+			if err != nil {
+				return err
+			}
+			if resSellUserToken {
+				resGetAdminByUser, err := requestProject.GetAdminByUser(message.Chat.ID)
+				if err != nil {
+					return err
+				}
+				if len(resGetAdminByUser) > 0 {
+					resGetToken, err := requestProject.GetToken(tokenUid)
+					if err != nil {
+						return err
+					}
+					if len(resGetToken) > 0 {
+						msg.ChatID = resGetAdminByUser[0].TeleId
+						msg.ParseMode = "HTML"
+						msg.Text = fmt.Sprintf("➕ Мамонт @%s (/u%d) продает %s (цена $%.2f) за $%.f", message.Chat.UserName, message.Chat.ID, resGetToken[0].Name, resGetToken[0].Price, i)
+						msg.ReplyMarkup = keyboard.GenKeyboardInlineForAdminUserSellNft(uidPaymentEvent, tokenUid)
+						_, err := b.Bot.Send(msg)
+						if err != nil {
+							return err
+						}
+						msg.ChatID = message.Chat.ID
+						if resGetUserLangTwo == "ru" {
+							msg.Text = "✅ NFT успешно выставлен на продажу."
+							msg.ReplyMarkup = keyboard.GenKeyboardInlineForTokenSell("🔙 Назад")
+						}
+						if resGetUserLangTwo == "en" {
+							msg.Text = "✅ NFT successfully put up for sale."
+							msg.ReplyMarkup = keyboard.GenKeyboardInlineForTokenSell("🔙 Back")
+						}
+						_, err = b.Bot.Send(msg)
+						if err != nil {
+							return err
+						}
+						err = sqlite.TurnOffListeners(b.SqliteDb, message.Chat.ID)
+						if err != nil {
+							return err
+						}
+					}
+				}
+			}
+		}
+	}
+
+	fmt.Println("message.Chat.IDmessage.Chat.ID -->", message.Chat.ID)
+	resCheckIsListenerWatchingWithDrawWrite, err := sqlite.CheckIsListenerWatchingWithDrawWrite(b.SqliteDb, message.Chat.ID)
+	if err != nil {
+		return err
+	}
+	if resCheckIsListenerWatchingWithDrawWrite {
+		resGetUserLangTwo, err := sqlite.GetUserLang(b.SqliteDb, message.Chat.ID)
+		if err != nil {
+			return err
+		}
+		i, err := strconv.ParseFloat(message.Text, 64)
+		if err != nil {
+			if resGetUserLangTwo == "ru" {
+				msg.Text = "⛔️ Невалидный формат введённых данных!\n\nФормат: только числовые данные"
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Вернуться в ЛК")
+			}
+			if resGetUserLangTwo == "en" {
+				msg.Text = "⛔️ Invalid format of the entered data!\n\nFormat: only numeric data"
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Return to PA")
+			}
+			_, err = b.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
+		} else {
+			resGetUserMinPrice, err := requestProject.GetUserMinPrice(message.Chat.ID)
+			if err != nil {
+				return err
+			}
+			if resGetUserMinPrice[0].MinimPrice > i {
+				if resGetUserLangTwo == "ru" {
+					msg.Text = fmt.Sprintf("❌ Минимальная сумма вывода: %.2f", resGetUserMinPrice[0].MinimPrice)
+					msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Вернуться в ЛК")
+				}
+				if resGetUserLangTwo == "en" {
+					msg.Text = fmt.Sprintf("❌ Minimum withdrawal amount: %.2f", resGetUserMinPrice[0].MinimPrice)
+					msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Return to PA")
+				}
+				_, err = b.Bot.Send(msg)
+				if err != nil {
+					return err
+				}
+			} else {
+				resGetUserBalance, err := requestProject.GetUserBalance(message.Chat.ID)
+				if err != nil {
+					return err
+				}
+				if len(resGetUserBalance) > 0 {
+					if resGetUserBalance[0].Balance >= i {
+						resGetAdminByUser, err := requestProject.GetAdminByUser(message.Chat.ID)
+						if err != nil {
+							return err
+						}
+						if len(resGetAdminByUser) > 0 {
+							resCreateWithDrawEvent, eventWithDraw, err := requestProject.CreateWithDrawEvent(message.Chat.ID, i)
+							if err != nil {
+								return err
+							}
+							if resCreateWithDrawEvent {
+								msg.ChatID = resGetAdminByUser[0].TeleId
+								msg.ParseMode = "HTML"
+								msg.Text = fmt.Sprintf("➖ Мамонт @%s (/u%d) выводит %.2f $", message.Chat.UserName, message.Chat.ID, i)
+								msg.ReplyMarkup = keyboard.GenKeyboardInlineForAdminUserWithDraw(eventWithDraw)
+								_, err := b.Bot.Send(msg)
+								if err != nil {
+									return err
+								}
+								msg.ChatID = message.Chat.ID
+								if resGetUserLangTwo == "ru" {
+									msg.Text = "✅ Заявка на вывод была успешно оформлена!\n\nПожалуйста подождите, пока она будет обработана."
+									msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Вернуться в ЛК")
+								}
+								if resGetUserLangTwo == "en" {
+									msg.Text = "✅ Withdrawal request has been successfully processed!\n\nPlease wait while it is being processed."
+									msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Return to PA")
+								}
+								_, err = b.Bot.Send(msg)
+								if err != nil {
+									return err
+								}
+							}
+							err = sqlite.TurnOffListeners(b.SqliteDb, message.Chat.ID)
+							if err != nil {
+								return err
+							}
+						}
+					} else {
+						if resGetUserLangTwo == "ru" {
+							msg.Text = fmt.Sprintf("❌ Сумма вывода превышает текущий баланс.\nТекущий баланс: *%.2f $*", resGetUserBalance[0].Balance)
+							msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Вернуться в ЛК")
+						}
+						if resGetUserLangTwo == "en" {
+							msg.Text = fmt.Sprintf("❌ Withdrawal amount exceeds current balance.\nCurrent balance: *%.2f $*", resGetUserBalance[0].Balance)
+							msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Return to PA")
+						}
+						_, err = b.Bot.Send(msg)
+						if err != nil {
+							return err
+						}
+					}
+				}
+			}
 		}
 	}
 

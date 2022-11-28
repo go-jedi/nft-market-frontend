@@ -9,7 +9,7 @@ func WithDrawPayment(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId in
 	if len(languageUser) > 0 {
 		if len(userPaymentChoose) > 0 {
 			if languageUser == "ru" {
-				msg.Text = "Withdrawal in crypto\n\n⚠️ Dear user, due to technical reasons crypto withdrawal is only available through our support team."
+				msg.Text = "Вывод средств в криптовалюте\n\n⚠️ Уважаемый пользователь, по техническим причинам вывод средств в криптовалюте возможен только через службу технической поддержки."
 				msg.ReplyMarkup = keyboard.GenKeyboardInlineForWithDrawPayment("👨‍💻 Поддержка", "🔙 Вернуться в ЛК")
 				_, err := bot.Send(msg)
 				if err != nil {

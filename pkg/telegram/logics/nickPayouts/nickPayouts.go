@@ -16,12 +16,12 @@ func NickPayouts(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int64,
 		if resChangeVisibleName {
 			if languageUser == "ru" {
 				msg.Text = "✅ Успешное изменение видимости имя"
-				msg.ReplyMarkup = keyboard.GenKeyboardInlineForMyNfts("🔙 Вернуться в ЛК")
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForNickPayload("🔙 Вернуться в ЛК")
 			}
 
 			if languageUser == "en" {
 				msg.Text = "✅ Successful name visibility change"
-				msg.ReplyMarkup = keyboard.GenKeyboardInlineForMyNfts("🔙 Back to profile")
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForNickPayload("🔙 Back to profile")
 			}
 
 			_, err = bot.Send(msg)

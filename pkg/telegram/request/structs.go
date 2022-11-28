@@ -431,3 +431,141 @@ type UserChangeVisibleNameResponse struct {
 	Status  int    `json:"status"`
 	Message string `json:"message"`
 }
+
+type UserBalance struct {
+	Balance float64 `json:"balance"`
+}
+
+type UserGetUserBalance struct {
+	TeleId int64 `json:"tele_id"`
+}
+
+type UserGetUserBalanceResponse struct {
+	Status  int           `json:"status"`
+	Message string        `json:"message"`
+	Result  []UserBalance `json:"result"`
+}
+
+type UserBuyUserToken struct {
+	TeleId     int64   `json:"tele_id"`
+	TokenUid   string  `json:"token_uid"`
+	TokenPrice float64 `json:"token_price"`
+}
+
+type UserBuyUserTokenResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type UserNft struct {
+	Name     string  `json:"name"`
+	Price    float64 `json:"price"`
+	Author   string  `json:"author"`
+	TokenUid string  `json:"token_uid"`
+}
+
+type UserGetNft struct {
+	NftBuy  []UserNft `json:"nft_buy"`
+	NftSell []UserNft `json:"nft_sell"`
+}
+
+type UserGetUserNft struct {
+	TeleId int64 `json:"tele_id"`
+}
+
+type UserGetUserNftResponse struct {
+	Status  int        `json:"status"`
+	Message string     `json:"message"`
+	Result  UserGetNft `json:"result"`
+}
+
+type UserSellUserToken struct {
+	TeleId     int64   `json:"tele_id"`
+	TokenUid   string  `json:"token_uid"`
+	TokenPrice float64 `json:"token_price"`
+}
+
+type UserSellUserTokenResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Result  string `json:"result"`
+}
+
+type UserAdminBuyTokenUser struct {
+	TeleId          int64   `json:"tele_id"`
+	TokenUid        string  `json:"token_uid"`
+	PriceUser       float64 `json:"price_user"`
+	UidPaymentEvent string  `json:"uid_payment_event"`
+}
+
+type UserAdminBuyTokenUserResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type UserCheckUserToken struct {
+	TeleId   int64  `json:"tele_id"`
+	TokenUid string `json:"token_uid"`
+}
+
+type UserCheckUserTokenResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Result  bool   `json:"result"`
+}
+
+type UserGetUserPaymentEvent struct {
+	EventUid string `json:"event_uid"`
+}
+
+type PaymentEvent struct {
+	TeleId    int64   `json:"tele_id"`
+	Uid       string  `json:"uid"`
+	NameToken string  `json:"name_token"`
+	Price     float64 `json:"price"`
+}
+
+type UserGetUserPaymentEventResponse struct {
+	Status  int            `json:"status"`
+	Message string         `json:"message"`
+	Result  []PaymentEvent `json:"result"`
+}
+
+type UserCreateWithDrawEvent struct {
+	TeleId int64   `json:"tele_id"`
+	Price  float64 `json:"price"`
+}
+
+type UserCreateWithDrawEventResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Result  string `json:"result"`
+}
+
+type UserGetWithDrawEvent struct {
+	WithDrawEventUid string `json:"with_draw_event_uid"`
+}
+
+type WithDrawEventGet struct {
+	TeleId     int64   `json:"tele_id"`
+	Uid        string  `json:"uid"`
+	Price      float64 `json:"price"`
+	IsFinished bool    `json:"is_finished"`
+}
+
+type UserGetWithDrawEventResponse struct {
+	Status  int                `json:"status"`
+	Message string             `json:"message"`
+	Result  []WithDrawEventGet `json:"result"`
+}
+
+type UserAdminWithdrawApprove struct {
+	TeleId           int64  `json:"tele_id"`
+	WithDrawEventUid string `json:"with_draw_event_uid"`
+}
+
+type UserAdminWithdrawApproveResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Result  bool   `json:"result"`
+}

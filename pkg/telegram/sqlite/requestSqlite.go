@@ -265,8 +265,67 @@ func CheckIsListenerWatchingMessageUser(sqliteDb *sql.DB, teleId int64) (bool, i
 	return botParams[0].WatchingMessageUser, botParams[0].ChooseTeleId, nil
 }
 
+func TurnOnListenerWatchingNftSell(sqliteDb *sql.DB, teleId int64, userTokenChoose string) error {
+	_, err := sqliteDb.Exec("UPDATE bot_params SET watching_nft_sell = $1, choose_tkn = $2 WHERE tele_id = $3", 1, userTokenChoose, teleId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func CheckIsListenerWatchingNftSell(sqliteDb *sql.DB, teleId int64) (bool, string, error) {
+	type BotParams struct {
+		WatchingChangeNftSell bool   `json:"watching_nft_sell"`
+		ChooseTkn             string `json:"choose_tkn"`
+	}
+	rows, err := sqliteDb.Query("SELECT watching_nft_sell, choose_tkn FROM bot_params WHERE tele_id = $1", teleId)
+	if err != nil {
+		return false, "", err
+	}
+	botParams := []BotParams{}
+	for rows.Next() {
+		bp := BotParams{}
+		err := rows.Scan(&bp.WatchingChangeNftSell, &bp.ChooseTkn)
+		if err != nil {
+			continue
+		}
+		botParams = append(botParams, bp)
+	}
+
+	return botParams[0].WatchingChangeNftSell, botParams[0].ChooseTkn, nil
+}
+
+func TurnOnListenerWatchingWithDrawWrite(sqliteDb *sql.DB, teleId int64) error {
+	_, err := sqliteDb.Exec("UPDATE bot_params SET watching_withdraw_write = $1 WHERE tele_id = $2", 1, teleId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func CheckIsListenerWatchingWithDrawWrite(sqliteDb *sql.DB, teleId int64) (bool, error) {
+	type BotParams struct {
+		WatchingWithDrawWrite bool `json:"watching_withdraw_write"`
+	}
+	rows, err := sqliteDb.Query("SELECT watching_withdraw_write FROM bot_params WHERE tele_id = $1", teleId)
+	if err != nil {
+		return false, err
+	}
+	botParams := []BotParams{}
+	for rows.Next() {
+		bp := BotParams{}
+		err := rows.Scan(&bp.WatchingWithDrawWrite)
+		if err != nil {
+			continue
+		}
+		botParams = append(botParams, bp)
+	}
+
+	return botParams[0].WatchingWithDrawWrite, nil
+}
+
 func TurnOffListeners(sqliteDb *sql.DB, teleId int64) error {
-	_, err := sqliteDb.Exec("UPDATE bot_params SET watching_write_price = $1, choose_payment = $2, watching_add_mam = $3, watching_find_mam = $4, watching_change_minlink = $5, watching_add_balance = $6, watching_change_minuser = $7, watching_change_balance = $8, watching_message_user = $9, choose_tele_id = $10 WHERE tele_id = $11", 0, "", 0, 0, 0, 0, 0, 0, 0, 0, teleId)
+	_, err := sqliteDb.Exec("UPDATE bot_params SET watching_write_price = $1, choose_payment = $2, watching_add_mam = $3, watching_find_mam = $4, watching_change_minlink = $5, watching_add_balance = $6, watching_change_minuser = $7, watching_change_balance = $8, watching_message_user = $9, choose_tele_id = $10, watching_nft_sell = $11, choose_tkn = $12, watching_withdraw_write = $13 WHERE tele_id = $14", 0, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, "", 0, teleId)
 	if err != nil {
 		return err
 	}
