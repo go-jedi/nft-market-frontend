@@ -1293,11 +1293,6 @@ func AdminBuyTokenUser(teleId int64, tokenUid string, priceNeed float64, uidPaym
 	if err != nil {
 		return false, err
 	}
-	b, err := io.ReadAll(response.Body)
-	if err != nil {
-		return false, err
-	}
-	fmt.Println("AdminBuyTokenUser b -->", string(b))
 	defer response.Body.Close()
 	if response.StatusCode == 200 {
 		body, err := io.ReadAll(response.Body)
