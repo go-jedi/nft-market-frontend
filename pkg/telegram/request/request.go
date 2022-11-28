@@ -1363,11 +1363,6 @@ func GetUserPaymentEvent(eventUid string) ([]PaymentEvent, error) {
 	if err != nil {
 		return []PaymentEvent{}, err
 	}
-	b, err := io.ReadAll(response.Body)
-	if err != nil {
-		return []PaymentEvent{}, err
-	}
-	fmt.Println("GetUserPaymentEvent b -->", string(b))
 	defer response.Body.Close()
 	if response.StatusCode == 200 {
 		body, err := io.ReadAll(response.Body)
