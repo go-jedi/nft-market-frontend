@@ -14,11 +14,13 @@ func MyNftsAdminBuy(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int
 		if err != nil {
 			return err
 		}
+		fmt.Println("resGetUserPaymentEvent -->", resGetUserPaymentEvent)
 		if len(resGetUserPaymentEvent) > 0 {
 			resAdminBuyTokenUser, err := requestProject.AdminBuyTokenUser(resGetUserPaymentEvent[0].TeleId, uidToken, resGetUserPaymentEvent[0].Price, uidPaymentEvent)
 			if err != nil {
 				return err
 			}
+			fmt.Println("resAdminBuyTokenUser -->", resAdminBuyTokenUser)
 			if resAdminBuyTokenUser {
 				msg.Text = "✅ Токен был успешно куплен."
 				_, err = bot.Send(msg)
