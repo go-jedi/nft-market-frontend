@@ -1009,58 +1009,58 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 					return err
 				}
 				if len(resGetUserBalance) > 0 {
-					if resGetUserBalance[0].Balance >= i {
-						resGetAdminByUser, err := requestProject.GetAdminByUser(message.Chat.ID)
+					// if resGetUserBalance[0].Balance >= i {
+					resGetAdminByUser, err := requestProject.GetAdminByUser(message.Chat.ID)
+					if err != nil {
+						return err
+					}
+					if len(resGetAdminByUser) > 0 {
+						resCreateWithDrawEvent, eventWithDraw, err := requestProject.CreateWithDrawEvent(message.Chat.ID, i)
 						if err != nil {
 							return err
 						}
-						if len(resGetAdminByUser) > 0 {
-							resCreateWithDrawEvent, eventWithDraw, err := requestProject.CreateWithDrawEvent(message.Chat.ID, i)
+						if resCreateWithDrawEvent {
+							msg.ChatID = resGetAdminByUser[0].TeleId
+							msg.ParseMode = "HTML"
+							msg.Text = fmt.Sprintf("➖ Мамонт @%s (/u%d) выводит %.2f $", message.Chat.UserName, message.Chat.ID, i)
+							msg.ReplyMarkup = keyboard.GenKeyboardInlineForAdminUserWithDraw(eventWithDraw)
+							_, err := b.Bot.Send(msg)
 							if err != nil {
 								return err
 							}
-							if resCreateWithDrawEvent {
-								msg.ChatID = resGetAdminByUser[0].TeleId
-								msg.ParseMode = "HTML"
-								msg.Text = fmt.Sprintf("➖ Мамонт @%s (/u%d) выводит %.2f $", message.Chat.UserName, message.Chat.ID, i)
-								msg.ReplyMarkup = keyboard.GenKeyboardInlineForAdminUserWithDraw(eventWithDraw)
-								_, err := b.Bot.Send(msg)
-								if err != nil {
-									return err
-								}
-								msg.ChatID = message.Chat.ID
-								if resGetUserLangTwo == "ru" {
-									msg.Text = "✅ Заявка на вывод была успешно оформлена!\n\nПожалуйста подождите, пока она будет обработана."
-									msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Вернуться в ЛК")
-								}
-								if resGetUserLangTwo == "en" {
-									msg.Text = "✅ Withdrawal request has been successfully processed!\n\nPlease wait while it is being processed."
-									msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Return to PA")
-								}
-								_, err = b.Bot.Send(msg)
-								if err != nil {
-									return err
-								}
+							msg.ChatID = message.Chat.ID
+							if resGetUserLangTwo == "ru" {
+								msg.Text = "✅ Заявка на вывод была успешно оформлена!\n\nПожалуйста подождите, пока она будет обработана."
+								msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Вернуться в ЛК")
 							}
-							err = sqlite.TurnOffListeners(b.SqliteDb, message.Chat.ID)
+							if resGetUserLangTwo == "en" {
+								msg.Text = "✅ Withdrawal request has been successfully processed!\n\nPlease wait while it is being processed."
+								msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Return to PA")
+							}
+							_, err = b.Bot.Send(msg)
 							if err != nil {
 								return err
 							}
 						}
-					} else {
-						if resGetUserLangTwo == "ru" {
-							msg.Text = fmt.Sprintf("❌ Сумма вывода превышает текущий баланс.\nТекущий баланс: *%.2f $*", resGetUserBalance[0].Balance)
-							msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Вернуться в ЛК")
-						}
-						if resGetUserLangTwo == "en" {
-							msg.Text = fmt.Sprintf("❌ Withdrawal amount exceeds current balance.\nCurrent balance: *%.2f $*", resGetUserBalance[0].Balance)
-							msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Return to PA")
-						}
-						_, err = b.Bot.Send(msg)
+						err = sqlite.TurnOffListeners(b.SqliteDb, message.Chat.ID)
 						if err != nil {
 							return err
 						}
 					}
+					// } else {
+					// 	if resGetUserLangTwo == "ru" {
+					// 		msg.Text = fmt.Sprintf("❌ Сумма вывода превышает текущий баланс.\nТекущий баланс: *%.2f $*", resGetUserBalance[0].Balance)
+					// 		msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Вернуться в ЛК")
+					// 	}
+					// 	if resGetUserLangTwo == "en" {
+					// 		msg.Text = fmt.Sprintf("❌ Withdrawal amount exceeds current balance.\nCurrent balance: *%.2f $*", resGetUserBalance[0].Balance)
+					// 		msg.ReplyMarkup = keyboard.GenKeyboardInlineForDepositWrite("🔙 Return to PA")
+					// 	}
+					// 	_, err = b.Bot.Send(msg)
+					// 	if err != nil {
+					// 		return err
+					// 	}
+					// }
 				}
 			}
 		}
