@@ -90,7 +90,7 @@ func DepositPayment(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int
 												needAddress = value.Value
 											}
 										}
-										var text string = fmt.Sprintf("Оплата в USDT\n\nЧтобы пополнить свой USDT из внешнего кошелька, используйте многоразовый адрес ниже.\n\n💱 Адрес USDT:\n`%s`\nСумма пополнения: *%.0f $*\n\nПосле внесения средств отправьте скриншот перевода в службу технической поддержки, и средства будут зачислены на ваш счет.\n\n⚠️ Уважаемый пользователь, обратите внимание, что все платежи менее *%.2f $* не будут зачислены на сервис, компенсация за данные операции также не предусмотрена.",
+										var text string = fmt.Sprintf("Оплата в USDT trc20\n\nЧтобы пополнить свой USDT из внешнего кошелька, используйте многоразовый адрес ниже.\n\n💱 Адрес USDT trc20:\n`%s`\nСумма пополнения: *%.0f $*\n\nПосле внесения средств отправьте скриншот перевода в службу технической поддержки, и средства будут зачислены на ваш счет.\n\n⚠️ Уважаемый пользователь, обратите внимание, что все платежи менее *%.2f $* не будут зачислены на сервис, компенсация за данные операции также не предусмотрена.",
 											needAddress,
 											resGetAllExchangeRates[2].Price*userPriceWrite,
 											resGetUserMinPrice[0].MinimPrice,
@@ -150,7 +150,7 @@ func DepositPayment(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId int
 												needAddress = value.Value
 											}
 										}
-										var text string = fmt.Sprintf("Payment in USDT\n\nTo top up your USDT from an external wallet, use the reusable address below.\n\n💱 USDT Address:\n`%s`\nReplenishment amount: *%.0f $*\n\nAfter depositing funds, send a screenshot of the transfer to technical support and the funds will be credited to your account.\n\n⚠️ Dear user, please note that all entries less than *%.2f ₽* will not be credited to the service, compensation for these operations is also not provided.",
+										var text string = fmt.Sprintf("Payment in USDT trc20\n\nTo top up your USDT from an external wallet, use the reusable address below.\n\n💱 USDT trc20 Address:\n`%s`\nReplenishment amount: *%.0f $*\n\nAfter depositing funds, send a screenshot of the transfer to technical support and the funds will be credited to your account.\n\n⚠️ Dear user, please note that all entries less than *%.2f ₽* will not be credited to the service, compensation for these operations is also not provided.",
 											needAddress,
 											resGetAllExchangeRates[2].Price*userPriceWrite,
 											resGetUserMinPrice[0].MinimPrice,

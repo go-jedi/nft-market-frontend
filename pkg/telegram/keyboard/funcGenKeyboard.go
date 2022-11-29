@@ -7,8 +7,11 @@ import (
 	requestProject "github.com/rob-bender/nft-market-frontend/pkg/telegram/request"
 )
 
-func GenKeyboardInlineForAgreeTerms(textBtn string, isAgreeTerms bool, lang string) tgbotapi.InlineKeyboardMarkup {
+func GenKeyboardInlineForAgreeTerms(textReccomendation string, textBtn string, isAgreeTerms bool, lang string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonURL(textReccomendation, "https://rarible.com/community-guidelines"),
+		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(textBtn, fmt.Sprintf("DG_AREG_HOME?%t,%s", isAgreeTerms, lang)),
 		),
@@ -34,7 +37,7 @@ func GenKeyboardInlineForNftMenu(collections []requestProject.Collection, textBt
 func GenKeyboardInlineForSupportMenu(textSupport string, textBackProfile string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/mySupportWorkBot"),
+			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/Rarible_Support_bot"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(textBackProfile, "NM_PROFILE"),
@@ -42,16 +45,19 @@ func GenKeyboardInlineForSupportMenu(textSupport string, textBackProfile string)
 	)
 }
 
-func GenKeyboardInlineForAboutMenu(textSupport string, textNews string, textReport string) tgbotapi.InlineKeyboardMarkup {
+func GenKeyboardInlineForAboutMenu(textSupport string, textNews string, termsOfUse string, textReport string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/mySupportWorkBot"),
+			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://rarible.com/"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL(textNews, "https://looksrare.org/"),
+			tgbotapi.NewInlineKeyboardButtonURL(textNews, "https://static.rarible.com/privacy.pdf"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL(textReport, "https://t.me/mySupportWorkBot"),
+			tgbotapi.NewInlineKeyboardButtonURL(termsOfUse, "https://static.rarible.com/terms.pdf"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonURL(textReport, "https://t.me/Rarible_Support_bot"),
 		),
 	)
 }
@@ -115,7 +121,7 @@ func GenKeyboardInlineForDeposit(textBackProfile string) tgbotapi.InlineKeyboard
 func GenKeyboardInlineForDepositPayment(textSupport string, textBackProfile string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/mySupportWorkBot"),
+			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/Rarible_Support_bot"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(textBackProfile, "NM_PROFILE"),
@@ -134,7 +140,7 @@ func GenKeyboardInlineForNickPayload(textBackProfile string) tgbotapi.InlineKeyb
 func GenKeyboardInlineForVerification(textSupport string, textBackProfile string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/mySupportWorkBot"),
+			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/Rarible_Support_bot"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(textBackProfile, "NM_PROFILE"),
@@ -179,7 +185,7 @@ func GenKeyboardInlineForWithDraw(textBackProfile string) tgbotapi.InlineKeyboar
 func GenKeyboardInlineForWithDrawPayment(textSupport string, textBackProfile string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/mySupportWorkBot"),
+			tgbotapi.NewInlineKeyboardButtonURL(textSupport, "https://t.me/Rarible_Support_bot"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(textBackProfile, "NM_PROFILE"),

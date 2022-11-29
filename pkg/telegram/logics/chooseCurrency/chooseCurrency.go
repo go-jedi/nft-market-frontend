@@ -21,8 +21,8 @@ func ChooseCurrency(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.Message
 			}
 			if languageChoose == "ru" {
 				msg.ParseMode = "HTML"
-				var text string = "Подтвердите, что вы не бот.\n\nНажмимая “Подтвердить“, Вы принимаете условия <a href='https://static.rarible.com/terms.pdf'>пользовательского соглашения</a>, <a href='https://static.rarible.com/privacy.pdf'>Условия конфиденциальности</a>."
-				msg.ReplyMarkup = keyboard.GenKeyboardInlineForAgreeTerms("✅ Подтвердить", true, languageChoose)
+				var text string = "🔸️Добро пожаловать!🔸️\n\nПеред использованием NFT площадки Rarible необходимо ознакомиться с `Рекомендациями для сообщества`"
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForAgreeTerms("Рекомендации Сообщества", "✅ Подтвердить", true, languageChoose)
 				msg.Text = text
 				_, err := bot.Send(msg)
 				if err != nil {
@@ -31,8 +31,8 @@ func ChooseCurrency(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.Message
 			}
 			if languageChoose == "en" {
 				msg.ParseMode = "HTML"
-				var text string = "Please, confirm you're not a robot.\n\nBy pressing “Accept“ you confirm that you've read and accept our <a href='https://static.rarible.com/terms.pdf'>Terms</a>, <a href='https://static.rarible.com/privacy.pdf'>Privacy</a>."
-				msg.ReplyMarkup = keyboard.GenKeyboardInlineForAgreeTerms("✅ Accept", true, languageChoose)
+				var text string = "🔸️Welcome!🔸️\n\nBefore using the Rarible NFT platform, you must read the `Recommendations for the Community`"
+				msg.ReplyMarkup = keyboard.GenKeyboardInlineForAgreeTerms("Community Recommendations", "✅ Accept", true, languageChoose)
 				msg.Text = text
 				_, err := bot.Send(msg)
 				if err != nil {
