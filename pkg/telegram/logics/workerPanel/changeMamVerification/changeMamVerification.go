@@ -27,10 +27,10 @@ func ChangeMamVerification(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, tel
 			if resAdminUpdateVerification {
 				msg.ChatID = userChooseTeleId
 				if languageUser == "ru" {
-					msg.Text = "Ваш аккаунта успешно верифицирован"
+					msg.Text = "✅ Ваш аккаунт прошёл верификацию"
 				}
 				if languageUser == "en" {
-					msg.Text = "Your account has been successfully verified"
+					msg.Text = "✅ Your account has been verified"
 				}
 				_, err := bot.Send(msg)
 				if err != nil {
@@ -38,7 +38,7 @@ func ChangeMamVerification(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, tel
 				}
 
 				msg.ChatID = teleId
-				msg.Text = "Успешное изменение верификации пользователя"
+				msg.Text = "✅ Успешное изменение верификации пользователя"
 				msg.ReplyMarkup = keyboard.GenKeyboardInlineForChangeMamVerification(userChooseTeleId)
 				_, err = bot.Send(msg)
 				if err != nil {
