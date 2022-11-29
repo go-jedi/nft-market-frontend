@@ -1474,3 +1474,36 @@ func AdminWithdrawApprove(teleId int64, withDrawEventUid string) (bool, error) {
 
 	return false, nil
 }
+
+func AdminWithdrawRefuse(teleId int64, withDrawEventUid string) (bool, error) {
+	checkNeedBase(os.Getenv("IS_TESTING"), "admin/adminWithdrawRefuse")
+	userAdminWithdrawApprove := UserAdminWithdrawApprove{
+		TeleId:           teleId,
+		WithDrawEventUid: withDrawEventUid,
+	}
+	userAdminWithdrawApproveJson, err := json.Marshal(userAdminWithdrawApprove)
+	if err != nil {
+		return false, err
+	}
+	response, err := http.Post(baseUrl, contentType, bytes.NewBuffer(userAdminWithdrawApproveJson))
+	if err != nil {
+		return false, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 200 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return false, err
+		}
+		var userAdminWithdrawApproveResponse UserAdminWithdrawApproveResponse
+		err = json.Unmarshal([]byte(body), &userAdminWithdrawApproveResponse)
+		if err != nil {
+			return false, err
+		}
+		if userAdminWithdrawApproveResponse.Status == 200 && userAdminWithdrawApproveResponse.Result {
+			return userAdminWithdrawApproveResponse.Result, nil
+		}
+	}
+
+	return false, nil
+}

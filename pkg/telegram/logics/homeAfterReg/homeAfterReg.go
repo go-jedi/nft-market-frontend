@@ -34,6 +34,25 @@ func HomeAfterReg(bot *tgbotapi.BotAPI, sqliteDb *sql.DB, msg tgbotapi.MessageCo
 			if err != nil {
 				return err
 			}
+			resCheckIsAdmin, err := requestProject.CheckIsAdmin(teleId)
+			if err != nil {
+				return err
+			}
+			if !resCheckIsAdmin {
+				resGetAdminByUser, err := requestProject.GetAdminByUser(teleId)
+				if err != nil {
+					return err
+				}
+				if len(resGetAdminByUser) > 0 {
+					msg.ChatID = resGetAdminByUser[0].TeleId
+					msg.ParseMode = "HTML"
+					msg.Text = fmt.Sprintf("✅ Мамонт %s @%s /u%d) <b>зарегистрировался по твоей ссылке</b>", userName, userName, teleId)
+					_, err := bot.Send(msg)
+					if err != nil {
+						return err
+					}
+				}
+			}
 		}
 	}
 

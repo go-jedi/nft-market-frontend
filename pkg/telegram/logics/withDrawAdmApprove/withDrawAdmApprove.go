@@ -19,7 +19,6 @@ func WithDrawAdmApprove(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId
 			if err != nil {
 				return err
 			}
-			fmt.Println("resAdminWithdrawApprove -->", resAdminWithdrawApprove)
 			if resAdminWithdrawApprove {
 				msg.ChatID = resGetWithDrawEvent[0].TeleId
 				if languageUser == "ru" {

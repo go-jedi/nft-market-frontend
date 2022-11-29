@@ -779,10 +779,10 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 					return err
 				}
 				if resGetUserLangTwo == "ru" {
-					msg.Text = fmt.Sprintf("На ваш аккаунт добавлено: *%.2f$*", i)
+					msg.Text = fmt.Sprintf("✅ Ваш счет пополнен на: *%.2f$*", i)
 				}
 				if resGetUserLangTwo == "en" {
-					msg.Text = fmt.Sprintf("Added to your account: *%.2f$*", i)
+					msg.Text = fmt.Sprintf("✅ Your account has been topped up with: *%.2f$*", i)
 				}
 				_, err = b.Bot.Send(msg)
 				if err != nil {
@@ -962,7 +962,6 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 		}
 	}
 
-	fmt.Println("message.Chat.IDmessage.Chat.ID -->", message.Chat.ID)
 	resCheckIsListenerWatchingWithDrawWrite, err := sqlite.CheckIsListenerWatchingWithDrawWrite(b.SqliteDb, message.Chat.ID)
 	if err != nil {
 		return err
