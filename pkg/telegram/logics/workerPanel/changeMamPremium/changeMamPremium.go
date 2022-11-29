@@ -27,10 +27,10 @@ func ChangeMamPremium(bot *tgbotapi.BotAPI, msg tgbotapi.MessageConfig, teleId i
 			if resAdminUpdatePremium {
 				msg.ChatID = userChooseTeleId
 				if languageUser == "ru" {
-					msg.Text = "Ваш аккаунта успешно переведён в премиум"
+					msg.Text = "✅ Ваш аккаунт получил премиум статус"
 				}
 				if languageUser == "en" {
-					msg.Text = "Your account has been successfully upgraded to Premium"
+					msg.Text = "✅ Your account has received a premium status"
 				}
 				_, err := bot.Send(msg)
 				if err != nil {
