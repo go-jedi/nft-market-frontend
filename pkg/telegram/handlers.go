@@ -360,7 +360,7 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 		if err != nil {
 			return err
 		}
-		err = withDrawAdmApprove.WithDrawAdmApprove(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
+		err = withDrawAdmApprove.WithDrawAdmApprove(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
 		if err != nil {
 			return err
 		}
@@ -369,7 +369,7 @@ func (b *Bot) callbackQuery(callbackQuery tgbotapi.CallbackQuery) error {
 		if err != nil {
 			return err
 		}
-		err = withDrawAdmRefuse.WithDrawAdmRefuse(b.Bot, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
+		err = withDrawAdmRefuse.WithDrawAdmRefuse(b.Bot, b.SqliteDb, msg, callbackQuery.Message.Chat.ID, callbackQuery.Message.Chat.UserName, resGetUserLang, needParams[1])
 		if err != nil {
 			return err
 		}
